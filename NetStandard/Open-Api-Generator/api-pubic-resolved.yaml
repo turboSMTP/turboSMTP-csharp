@@ -1,0 +1,5692 @@
+---
+openapi: 3.0.0
+info:
+  title: TurboSMTP Public APIs
+  description: "This document describes all public turboSMTP **V2** API and offers endpoints Descriptions, Parameters, Requests, Responses and Samples of usage.\n\n[Click here to view the previous version of turboSMTP Public API Version 1.0](https://www.serversmtp.com/turbo-api-1)\n\n\n# Security\nFor the most part (and where not otherwise explicit) turboSMTP’s API requires Authorization. \n\nAuthorization to access a user’s resource is granted to clients provided they set  authentication headers into their request, valued with the proper values issued by turboSMTP servers.\n\n## *  Authorization via ConsumerKey/ConsumerSecret\n\nThis type of authorization consists of a pair of headers, named consumerKey and consumerSecret that are created and granted to the end user to be used in a permanent way (unless they´re deleted of course). This kind of authentication is intended to provide access to endpoints features without the need of providing the user the account details (email address + password).\n\n*consumerKey:* Consumer Key Granted.\n\n*consumerSecret:* Consumer Secret Granted.\n\n(Use [/consumerKeys/create](#/consumerkey/createConsumerKey) create a consumer key/secret pair).    \n\n## *  Authorization via Authentication Key\n\nThe authentication key is user-based and it is issued by turboSMTP servers upon successful user’s email address + password challenge, performed by means of appropriate request.    \n\n*Authorization:* Authorization_Key\n\n(Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)\n\n# Data Interchange Format\n\nFor the most part (and where not otherwise explicit) turboSMTP’s API uses JSON as the data format of choice when it comes to request and response bodies.\n\n\n\n  \n"
+  contact:
+    email: api@turbo-smtp.com
+  version: 2.0.0-oas3
+servers:
+- url: https://staging.api.serversmtp.com/api/v2
+  description: turboSMTP Staging Server
+- url: http://185.228.39.82:8084/api/v2
+  description: Radwan Dev Server
+- url: https://pro.api.serversmtp.com/api/v2
+  description: turboSMTP Production Server
+tags:
+- name: authentication
+  description: Authentication
+- name: mail
+  description: Send email message
+- name: suppressions
+  description: Suppressions
+- name: meta
+  description: Meta
+- name: billing
+  description: Billing
+- name: email-validator
+  description: Email Validator
+- name: subaccounts
+  description: Subaccounts
+- name: alerts
+  description: Alerts
+- name: analytics
+  description: Analytics
+- name: consumerkey
+  description: Api Keys
+paths:
+  /authorize:
+    post:
+      tags:
+      - authentication
+      summary: Login - Get API Key
+      description: |
+        **This endpoint allows you to get an API Key**
+
+        By providing your turboSMTP authentication details you will be able to get an API Key.
+
+        Use your API Key to consume APIs that require authorization.
+      operationId: AuthenticationLogin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthenticationLoginRequestBody'
+        required: true
+      responses:
+        "200":
+          description: |
+            Sucess
+
+            User logged in sucessfully, use the auth value as API Key from request body in future API calls.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticationLoginSucessResponsetBody'
+        "400":
+          description: |
+            Bad Request
+
+            ###### Produces:
+
+            * missing_required_parameter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonBadRequestResponseBody'
+        "403":
+          description: "Forbidden\n\nEmail address or password provided are incorrect.\n\n###### Produces: \n\n* wrong_credentials_specified\n"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: wrong_credentials_specified
+  /deauthorize:
+    post:
+      tags:
+      - authentication
+      summary: Logout - Revoke API Key
+      description: |
+        **This endpoint allows you to revoke your API Key**
+      operationId: AuthenticationLogout
+      responses:
+        "200":
+          description: |
+            Sucess
+
+            User logged out sucessfully, API Key is no longer valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: token_deauthorized
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /change-password:
+    put:
+      tags:
+      - authentication
+      summary: Change turboSMTP password
+      description: |
+        **This endpoint allows you to change your current password**
+
+        ## PASSWORD RULES
+
+          * Passwords must have at least 10 characters.
+          * At least one character must be uppercase.
+          * At least one character must be lowercase.
+          * At least one character must be numeric.
+      operationId: ChangePassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequestBody'
+        required: true
+      responses:
+        "200":
+          description: "Sucess\n\nPassword changed sucessfully.   \n"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonSuccessResponseBody'
+        "400":
+          description: "Bad Request\n\n###### Produces:\n\n* invalid_mail_address\n* current_password_is_missing\n* current_password_can_not_be_empty\n* password_is_missing\n* password_length_should_not_be_less_than_10_characters\n* password_should_contain_at_least_one_uppercase_character\n* password_should_contain_at_least_one_lowercase_character\n* password_should_contain_at_least_one_digit\n* confirm_password_is_missing\n* password_should_equal_confirm_password\n* new_password_should_not_equal_current_password            \n"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangePasswordBadRequestResponseBody'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+        "403":
+          description: "Forbidden\n\nCurrent password provided is incorrect.\n\n###### Produces: \n\n* password_is_invalid\n* not_allowed_for_apikey\n"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: password_is_invalid
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /forgot-password:
+    get:
+      tags:
+      - authentication
+      summary: Forgot Password - Verify if Secret Passord Recovery token is valid.
+      description: |
+        Forgot Password - check if secret token is valid
+
+        **Note**: Tokens are valid for 1 hour.
+      operationId: CheckValidityTokenResetPassword
+      parameters:
+      - name: token
+        in: query
+        description: Secret Token
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "Sucess\n\nToken is valid.  \n"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonSuccessResponseBody'
+        "400":
+          description: |
+            Bad Request
+
+            ###### Produces:
+
+            * forgot_password_token_is_missing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckValidityTokenResetPasswordBadRequestResponseBody'
+        "403":
+          description: "Forbidden\n\nToken is invalid.  \n"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: token_is_invalid
+      security:
+      - ApiKeyAuth: []
+    put:
+      tags:
+      - authentication
+      summary: Forgot Password - change password
+      description: |
+        **This endpoint allows you to reset your password by using a password reset token**
+
+        ## PASSWORD RULES
+
+          * Passwords must have at least 10 characters.
+          * At least one character must be uppercase.
+          * At least one character must be lowercase.
+          * At least one character must be numeric.
+      operationId: UpdateResetPassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateResetPasswordRequestBody'
+        required: true
+      responses:
+        "200":
+          description: "Sucess\n\nPassword reset sucessfully.   \n"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonSuccessResponseBody'
+        "400":
+          description: |
+            Bad Request
+
+            ###### Produces:
+
+            * empty_request_body
+            * token_is_missing
+            * token_can_not_be_empty
+            * password_is_missing
+            * password_length_should_not_be_less_than_10_characters
+            * password_should_contain_at_least_one_uppercase_character
+            * password_should_contain_at_least_one_lowercase_character
+            * password_should_contain_at_least_one_digit
+            * confirm_password_is_missing
+            * password_should_equal_confirm_password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateResetPasswordBadRequestResponseBody'
+        "403":
+          description: "Forbidden\n\nToken is invalid.  \n"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: token_is_invalid
+    post:
+      tags:
+      - authentication
+      summary: Forgot Password - Use in case you don´t remember your turboSMTP password
+      description: |
+        **This endpoint will allow you to get an email that will help you reset your turboSMTP password**
+
+        In your password reset email you will find:
+
+        * A **Reset Password** button that will take you to the password reset form on turboSMTP website.
+        * A secret token to be used to reset the password via [/authentication/forgot-password](#/authentication/updateResetPassword). **Note**: Token is vaid for 1 hour.
+      operationId: SendSecretTokenResetPassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendSecretTokenResetPasswordRequestBody'
+        required: true
+      responses:
+        "200":
+          description: "Sucess\n\nPassword reset email with instructions was sent to your turboSMTP email account.   \n"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonSuccessResponseBody'
+        "400":
+          description: "Bad Request\n\n###### Produces:\n\n* empty_request_body\n* missing_required_parameter   \n"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendSecretTokenResetPasswordBadRequestResponseBody'
+        "404":
+          description: |
+            Not Found
+
+            Please verify the email address provided is the one you used to register at turboSMTP.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: email_not_found
+  /mail/send:
+    post:
+      tags:
+      - mail
+      summary: Send email message
+      description: "Send email message\n\n###### **Notes:**\n**- When using API Keys (suggested authentication method), authuser and authpass properties should not be included.**\n\n**- Switch to \"Complete Email Send Request Body\" sample to learn about advanced features such as using attachments, custom headers like reply-to address, tracking and others.**\n\n###### Limitations:\n    \n* The total size of your email, including attachments, must be less than 24MB.\n"
+      operationId: sendEmail
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailRequestBody'
+            examples:
+              Short:
+                summary: Simple Email Send Request Body
+                value:
+                  authuser: user@example.com
+                  authpass: SMkhhf4J68XX
+                  from: user@example.com
+                  to: "user@example.com,user2@example.com"
+                  subject: This is a test message
+                  cc: cc_user@example.com
+                  bcc: bcc_user@example.com
+                  content: This is plain text version of the message.
+                  html_content: This is <b>HTML</b> version of the message.
+              Full:
+                summary: Complete Email Send Request Body
+                value:
+                  authuser: user@example.com
+                  authpass: SMkhhf4J68XX
+                  from: user@example.com
+                  to: "user@example.com,user2@example.com"
+                  subject: This is a test message
+                  cc: cc_user@example.com
+                  bcc: bcc_user@example.com
+                  content: This is plain text version of the message.
+                  html_content: This is <b>HTML</b> version of the message.
+                  custom_headers:
+                    List-Unsubscribe: <https://www.example.com/unlist?id=8822772727>
+                    X-Entity-Ref-ID: 4ec7b020-51dc-442f-bd39-9b0a32c3eb83
+                    Tracking-Id: "888884433"
+                    reply-to: alternative-email@domain.com
+                  mime_raw: string
+                  reference_id: string
+                  attachments:
+                  - content: dXBsb2FkZXIxQGdtYWlsLmNvbQ0KdXBsb2FkZXIyQGdtYWlsLmNvbQ0KYWJjMQ==
+                    name: list.txt
+                    type: text/plain
+        required: true
+      responses:
+        "200":
+          description: |
+            Sucess
+
+            Turbo-SMTP successfully received your message.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendSucessResponsetBody'
+        "400":
+          description: |
+            Bad Request
+
+            There was a problem processing the request due to an invalid/missing parameter for the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendBadRequestResponseBody'
+              examples:
+                MissingSender:
+                  summary: Sender mail address (from) has not been issued or is invalid
+                  value:
+                    message: error
+                    errors:
+                    - missing or not valid sender email (from)
+                MissingRecipients:
+                  summary: Recipients mail addresses (to) have not been issued
+                  value:
+                    message: error
+                    errors:
+                    - missing recipients (to)
+                InvalidRecipients:
+                  summary: "Invalid email addresses in to, cc or bcc fields"
+                  value:
+                    message: error
+                    errors:
+                    - - '''abc'' ''to'' email not valid'
+                      - '''cc_@ab1'' ''cc'' email not valid'
+                      - '''bcc_@ab3'' ''bcc'' email not valid'
+                InvalidMime:
+                  summary: Invalid MIME content
+                  value:
+                    message: error
+                    errors:
+                      message: error
+                      errors: Invalid Mime
+                InsuficientCredit:
+                  summary: Not enought credit in account subscription
+                  value:
+                    message: error
+                    errors:
+                      message: error
+                      errors: nocredit
+        "401":
+          description: |
+            Unauthorized
+
+            Missing or Invalid Turbo-SMTP credentials provided.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendUnauthorizedResponseBody'
+              examples:
+                MissingAuthorizationToken:
+                  summary: UserName and/or Password where not properly issued via authuser/authpass
+                  value:
+                    errorCode: 3
+                    message: Invalid authorization token
+                    details: "No authorization key was specified for request: POST /api/mail/send"
+                InvalidAuthorizationToken:
+                  summary: Invalid Username / Password
+                  value:
+                    error: 3
+                    message: Wrong credentials specified
+                DeactivatedAccount:
+                  summary: Account is innactive
+                  value:
+                    error: 3
+                    message: Account for developer@your-domain.com is inactive
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+      servers:
+      - url: https://api.turbo-smtp.com/api/v2
+        description: turboSMTP SEND production server
+  /suppressions/import:
+    post:
+      tags:
+      - suppressions
+      summary: Import Suppressions
+      description: |2
+
+        Import Suppressions
+      operationId: importSuppressions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SuppressionImportJson'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SuppressionImportFile'
+        required: true
+      responses:
+        "200":
+          description: |
+            Sucess
+
+            Email Addresses were imported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuppressionUploadResponse'
+        "400":
+          description: |
+            Bad Request
+
+            ###### Produces:
+
+            * missing_upload_file
+            * invalid_mail_address_list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuppressionUploadBadRequestResponseBody'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /suppressions:
+    get:
+      tags:
+      - suppressions
+      summary: Get Suppressions Data
+      description: |
+        Get Suppressions Data
+      operationId: getSuppressions
+      parameters:
+      - name: page
+        in: query
+        description: Page number
+        required: false
+        schema:
+          $ref: '#/components/schemas/Page'
+        example: 1
+      - name: limit
+        in: query
+        description: The numbers of rows per page to return
+        required: false
+        schema:
+          $ref: '#/components/schemas/PageLimit'
+        example: 10
+      - name: from
+        in: query
+        description: Start date
+        required: true
+        schema:
+          $ref: '#/components/schemas/FromDate'
+        example: 2020-01-01
+      - name: to
+        in: query
+        description: End date
+        required: true
+        schema:
+          $ref: '#/components/schemas/ToDate'
+        example: 2025-12-31
+      - name: tz
+        in: query
+        description: Timezone Offset
+        schema:
+          $ref: '#/components/schemas/Timezone'
+        example: -07:00
+      - name: filter
+        in: query
+        description: "Text to search (recipient, sender, email subject or reason for suppression)"
+        required: false
+        schema:
+          $ref: '#/components/schemas/SuppressionFilter'
+        examples:
+          byemail:
+            summary: Search for recipient or sender.
+            value: Jhon.Doe@gmail.com
+          bytitle:
+            summary: Search for email title.
+            value: September 2022
+          byreason:
+            summary: Search for imported supressions.
+            value: Imported removal request
+      - name: filter_by
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/SuppressionFilterBy'
+      - name: smart_search
+        in: query
+        description: Smart search
+        required: false
+        schema:
+          $ref: '#/components/schemas/SmartSearch'
+        example: false
+      - name: orderby
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/SuppressionOrderBy'
+      - name: ordertype
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/OrderType'
+      responses:
+        "200":
+          description: |
+            Sucess
+
+            Get Filtered Suppressions Data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuppressionsSucessResponsetBody'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+    post:
+      tags:
+      - suppressions
+      summary: Filter suppressions
+      description: |
+        Get Suppressions Data
+      operationId: filterSuppressions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SuppressionFilterOrderPageRequestBody'
+        required: true
+      responses:
+        "200":
+          description: |
+            Sucess
+
+            Get Filtered Suppressions Data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuppressionsSucessResponsetBody'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /suppressions/csv:
+    get:
+      tags:
+      - suppressions
+      summary: Export Suppressions data in CSV file
+      description: |
+        Export Suppressions data in CSV file
+      operationId: exportSuppressionsDataCSV
+      parameters:
+      - name: from
+        in: query
+        description: Start date
+        required: true
+        schema:
+          $ref: '#/components/schemas/FromDate'
+        example: 2020-01-01
+      - name: to
+        in: query
+        description: End date
+        required: true
+        schema:
+          $ref: '#/components/schemas/ToDate'
+        example: 2025-12-31
+      - name: tz
+        in: query
+        description: Timezone Offset
+        schema:
+          $ref: '#/components/schemas/Timezone'
+        example: -07:00
+      - name: filter
+        in: query
+        description: "Text to search (recipient, sender, email subject or reason for suppression)"
+        required: false
+        schema:
+          $ref: '#/components/schemas/SuppressionFilter'
+        examples:
+          byemail:
+            summary: Search for recipient or sender.
+            value: Jhon.Doe@gmail.com
+          bytitle:
+            summary: Search for email title.
+            value: September 2022
+          byreason:
+            summary: Search for imported supressions.
+            value: Imported removal request
+      - name: filter_by
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/SuppressionFilterBy'
+      - name: smart_search
+        in: query
+        description: Smart search
+        required: false
+        schema:
+          $ref: '#/components/schemas/SmartSearch'
+        example: false
+      - name: orderby
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/SuppressionOrderBy'
+      - name: ordertype
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/OrderType'
+      responses:
+        "200":
+          description: Suppressions CSV data
+          content:
+            text/csv:
+              schema:
+                type: string
+                example: |
+                  Status;Subject;From;To;Date;Reason
+                  FAIL;"new email alert";msaad@emailchef.com;a.shatata@emailchef.com;2022-06-28T15:08:37.821Z;"199.187.175.11 does not like recipient.
+                  Remote host said: 550 5.1.1 <a.shatata@emailchef.com>: Recipient address rejected: User unknown in virtual mailbox table
+                  {199.244.75.250}{550} Giving up on 199.187.175.11.
+                  "
+                  MANUAL;;;mohamed@test.com;2022-06-18T19:51:04.914Z;
+                  FAIL;"Test sending email";msaad@emailchef.com;mshatta@yahoo.com;2021-05-03T12:21:48.000Z;"67.195.204.73 failed after I sent the message. Remote host said: 554 30 Sorry, your message to mshatta@yahoo.com cannot be delivered. This mailbox is disabled (554.30). "
+                  FAIL;"Test sending email";msaad@emailchef.com;mohamed_s_shatta@gmail.com;2021-05-03T12:21:04.000Z;"142.250.138.26 does not like recipient. Remote host said: 550-5.1.1 The email account that you tried to reach does not exist. Please try 550-5.1.1 double-checking the recipient's email address for typos or 550-5.1.1 unnecessary spaces. Learn more at 550 5.1.1  https://support.google.com/mail/?p=NoSuchUser g15si5159810otg.85 - gsmtp {199.244.75.250}{550} Giving up on 142.250.138.26. "
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+    post:
+      tags:
+      - suppressions
+      summary: Export filtered suppressions
+      description: |
+        Export Filtered Suppressions
+      operationId: exportFilterSuppressions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SuppressionFilterRequestBody'
+        required: true
+      responses:
+        "200":
+          description: Suppressions CSV data
+          content:
+            text/csv:
+              schema:
+                type: string
+                example: |
+                  Status;Subject;From;To;Date;Reason
+                  FAIL;"new email alert";msaad@emailchef.com;a.shatata@emailchef.com;2022-06-28T15:08:37.821Z;"199.187.175.11 does not like recipient.
+                  Remote host said: 550 5.1.1 <a.shatata@emailchef.com>: Recipient address rejected: User unknown in virtual mailbox table
+                  {199.244.75.250}{550} Giving up on 199.187.175.11.
+                  "
+                  MANUAL;;;mohamed@test.com;2022-06-18T19:51:04.914Z;
+                  FAIL;"Test sending email";msaad@emailchef.com;mshatta@yahoo.com;2021-05-03T12:21:48.000Z;"67.195.204.73 failed after I sent the message. Remote host said: 554 30 Sorry, your message to mshatta@yahoo.com cannot be delivered. This mailbox is disabled (554.30). "
+                  FAIL;"Test sending email";msaad@emailchef.com;mohamed_s_shatta@gmail.com;2021-05-03T12:21:04.000Z;"142.250.138.26 does not like recipient. Remote host said: 550-5.1.1 The email account that you tried to reach does not exist. Please try 550-5.1.1 double-checking the recipient's email address for typos or 550-5.1.1 unnecessary spaces. Learn more at 550 5.1.1  https://support.google.com/mail/?p=NoSuchUser g15si5159810otg.85 - gsmtp {199.244.75.250}{550} Giving up on 142.250.138.26. "
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /suppressions/bulk_delete:
+    post:
+      tags:
+      - suppressions
+      summary: Bulk delete suppressions
+      description: |
+        Bulk delete suppressions
+      operationId: bulkDeleteSuppressions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SuppressionBulkDeleteRequestBody'
+        required: true
+      responses:
+        "200":
+          description: Suppressions were sucessfully deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuppressionsDeleteSuccess'
+        "400":
+          description: |
+            Bad Request
+
+            ###### Produces:
+
+            * no_contacts_were_provided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonBadRequestResponseBody'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /suppressions/delete:
+    post:
+      tags:
+      - suppressions
+      summary: Delete suppressions
+      description: |
+        Delete suppressions
+      operationId: deleteFilterSuppressions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SuppressionFilterRequestBody'
+        required: true
+      responses:
+        "200":
+          description: deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuppressionsDeleteSuccess'
+        "400":
+          description: "Bad Request\n\n###### Produces:\n\n* \n"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonBadRequestResponseBody'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /meta/countries:
+    get:
+      tags:
+      - meta
+      summary: Get countries
+      description: |
+        Get countries
+      operationId: getCountries
+      responses:
+        "200":
+          description: Countries list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountryList'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /meta/state/{isoCode}:
+    get:
+      tags:
+      - meta
+      summary: Get states by country
+      description: |
+        Get states by country
+      operationId: getStatesByCountry
+      parameters:
+      - name: isoCode
+        in: path
+        description: Country ISO code
+        required: true
+        schema:
+          type: string
+          example: ES
+      responses:
+        "200":
+          description: States selected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StateList'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+        "404":
+          description: |
+            Not Found
+
+            Please verify the Country Iso Code Provided.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: invalid_iso_code
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /billing/buy_emailvalidation_credits:
+    post:
+      tags:
+      - billing
+      summary: Buy Email Validator Credits
+      description: |2
+
+        Buy Email Validator Credits
+      operationId: buyEmailValidatorCredits
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BuyEmailValidatorCreditsRequest'
+        required: true
+      responses:
+        "200":
+          description: "Sucess\n\nReturns url to the billing system to allow payment completition. \n"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BuyEmailValidatorCreditsSucessResponse'
+        "400":
+          description: |
+            Bad Request
+
+            ###### Produces:
+
+            * missing_required_parameter_amount
+            * amount_should_be_integer
+            * amount_should_not_be_less_than_15
+            * amount_should_not_be_higher_than_1800
+            * can_not_buy_extra_credit_without_active_plan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BuyEmailValidatorCreditsBadRequestResponseBody'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /emailvalidation/subscription:
+    get:
+      tags:
+      - email-validator
+      summary: Get Email Validation subscription
+      description: |2
+
+        This endpoint allows to get details about remaining credit / balance for email validation.
+      operationId: getEmailValidationSubscription
+      responses:
+        "200":
+          description: |
+            Sucess
+
+            Email Validation Subscription.
+
+            #### Note: ####
+
+            * Free credits are measured in credits units, each credit enables 1 email validation.
+
+            * Paid credits represent available monetary balance, as email vaidations are performed, balance will be deduced, cost per email validation is variable depending on ammount of validated emails.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailValidatorSubscription'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /emailvalidation/upload:
+    post:
+      tags:
+      - email-validator
+      summary: Upload file for email validation
+      description: |2
+
+        Upload file for email validation
+      operationId: uploadEmailValidationFile
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: |
+            Sucess
+
+            Uploaded file was created at the server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailValidationUploadResponse'
+        "400":
+          description: |
+            Bad Request
+
+            ###### Produces:
+
+            * missing_upload_file
+            * invalid_mail_address_list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailValidatorUploadBadRequestResponseBody'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /emailvalidation/lists:
+    get:
+      tags:
+      - email-validator
+      summary: Get Email validation lists information
+      description: |2
+
+        List files for email validation information
+      operationId: getEmailValidationLists
+      parameters:
+      - name: page
+        in: query
+        description: Page number
+        required: false
+        schema:
+          $ref: '#/components/schemas/Page'
+        example: 1
+      - name: limit
+        in: query
+        description: The numbers of rows per page to return
+        required: false
+        schema:
+          $ref: '#/components/schemas/PageLimit'
+        example: 10
+      - name: from
+        in: query
+        description: Start date
+        required: true
+        schema:
+          $ref: '#/components/schemas/FromDate'
+        example: 2020-01-01
+      - name: to
+        in: query
+        description: End date
+        required: true
+        schema:
+          $ref: '#/components/schemas/ToDate'
+        example: 2025-12-31
+      - name: tz
+        in: query
+        description: Timezone Offset
+        schema:
+          $ref: '#/components/schemas/Timezone'
+        example: -07:00
+      responses:
+        "200":
+          description: |
+            Sucess
+
+            Get Email Validation Lists Data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailValidatorSucessResponsetBody'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /emailvalidation/lists/{Id}:
+    get:
+      tags:
+      - email-validator
+      summary: Get Email validation list details
+      description: |2
+
+        Get Email validation list details
+      operationId: getEmailValidationListSummary
+      parameters:
+      - name: Id
+        in: path
+        description: Id
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: |
+            Sucess
+
+            Get Email Validation List Data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailValidatorList'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+        "404":
+          description: |
+            Not Found
+
+            Please verify the list id is valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: list_not_found
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+    delete:
+      tags:
+      - email-validator
+      summary: Delete email validation list
+      description: |2
+
+        Delete email validation list
+      operationId: deleteEmailValidationListById
+      parameters:
+      - name: Id
+        in: path
+        description: Id
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: |
+            Sucess
+
+            Email validation list was deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailValidatorListDeleteSuccess'
+        "404":
+          description: |
+            Not Found
+
+            Please verify the list id is valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: list_not_found
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /emailvalidation/lists/{Id}/validate:
+    post:
+      tags:
+      - email-validator
+      summary: |
+        Validate list in Email Validator
+      description: |
+        Validate list in Email Validator
+      operationId: validateEmailValidatorList
+      parameters:
+      - name: Id
+        in: path
+        description: Id
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: |
+            Sucess
+
+            List was validated sucessfully.
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+        "400":
+          description: |
+            Bad Request
+
+            ###### Produces:
+
+            * list_already_validated
+            * insufficient_credit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailValidatorValidateListBadRequestResponseBody'
+        "404":
+          description: |
+            Not Found
+
+            Please verify the list id is valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: list_not_found
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /emailvalidation/lists/{Id}/emails:
+    get:
+      tags:
+      - email-validator
+      summary: Get Validated Emails by Email Validation List
+      description: |2
+
+        Get Validated Emails by Email Validation List
+      operationId: getValidatedEmailsByList
+      parameters:
+      - name: page
+        in: query
+        description: Page number
+        required: false
+        schema:
+          $ref: '#/components/schemas/Page'
+        example: 1
+      - name: limit
+        in: query
+        description: The numbers of rows per page to return
+        required: false
+        schema:
+          $ref: '#/components/schemas/PageLimit'
+        example: 10
+      - name: Id
+        in: path
+        description: Id
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: |
+            Sucess
+
+            Get Email Validation List Data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailValidatorValidatedMailsResults'
+              examples:
+                ValidatedList:
+                  summary: Example for a list that has been validated
+                  value:
+                    count: 2
+                    processed: 2
+                    results:
+                    - email: mail@thearter-gallery.eu
+                      id: 500157
+                      status: do_not_mail
+                      sub_status: null
+                      free_email: null
+                      domain: thearter-gallery.eu
+                      domain_age_days: null
+                      smtp_provider: null
+                      mx_found: null
+                      mx_record: null
+                    - email: staffdevelopment@guidingteachers.org
+                      id: 500158
+                      status: valid
+                      sub_status: null
+                      free_email: null
+                      domain: guidingteachers.org
+                      domain_age_days: null
+                      smtp_provider: null
+                      mx_found: null
+                      mx_record: null
+                NotValidatedList:
+                  summary: Example for a list that has not been validated yet
+                  value:
+                    count: 2
+                    processed: 0
+                    results: []
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+        "404":
+          description: |
+            Not Found
+
+            Please verify the list id is valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: list_not_found
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /emailvalidation/lists/{Id}/emails/{emailId}:
+    get:
+      tags:
+      - email-validator
+      summary: Get Email validation data by email ID.
+      description: |2
+
+        Get Email validation data by email ID.
+      operationId: getEmailValidationDataByEmailId
+      parameters:
+      - name: Id
+        in: path
+        description: Id
+        required: true
+        schema:
+          type: integer
+      - name: emailId
+        in: path
+        description: Email validation ID obtained from the list.
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: "Sucess\n\nDetails of validated email address. \n\n**Note**: Make sure to check the complete \"status\" and \"sub_status\" properties documentation from the schema.\n"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailValidatorListEmailDetails'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+        "404":
+          description: |
+            Not Found
+
+            Please verify the list id and email id are valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              examples:
+                InvalidListId:
+                  summary: Invalid List Id
+                  value:
+                    message: list_not_found
+                InvalidEmailId:
+                  summary: Invalid Email Id
+                  value:
+                    message: email_not_found
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /emailvalidation/lists/{Id}/csv:
+    get:
+      tags:
+      - email-validator
+      summary: Export Validated Emails by Email Validation List to CSV File
+      description: |2
+
+        Export Validated Emails by Email Validation List to CSV File
+      operationId: exportCSVValidatedEmailsByList
+      parameters:
+      - name: Id
+        in: path
+        description: Id
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: |
+            Sucess
+
+            Validated Emails by Email Validation List CSV File
+          content:
+            text/csv:
+              schema:
+                type: string
+                example: "Status;Subject;From;To;Date;Reason\nFAIL;\"new email alert\";msaad@emailchef.com;a.shatata@emailchef.com;2022-06-28T15:08:37.821Z;\"199.187.175.11 does not like recipient.\nRemote host said: 550 5.1.1 <a.shatata@emailchef.com>: Recipient address rejected: User unknown in virtual mailbox table\n{199.244.75.250}{550} Giving up on 199.187.175.11.\n\"\nMANUAL;;;mohamed@test.com;2022-06-18T19:51:04.914Z;\nFAIL;\"Test sending email\";msaad@emailchef.com;mshatta@yahoo.com;2021-05-03T12:21:48.000Z;\"67.195.204.73 failed after I sent the message. Remote host said: 554 30 Sorry, your message to mshatta@yahoo.com cannot be delivered. This mailbox is disabled (554.30). \"\nFAIL;\"Test sending email\";msaad@emailchef.com;mohamed_s_shatta@gmail.com;2021-05-03T12:21:04.000Z;\"142.250.138.26 does not like recipient. Remote host said: 550-5.1.1 The email account that you tried to reach does not exist. Please try 550-5.1.1 double-checking the recipient's email address for typos or 550-5.1.1 unnecessary spaces. Learn more at 550 5.1.1  https://support.google.com/mail/?p=NoSuchUser g15si5159810otg.85 - gsmtp {199.244.75.250}{550} Giving up on 142.250.138.26. \"    \n"
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+        "404":
+          description: |
+            Not Found
+
+            Please verify the list id is valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: list_not_found
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /emailvalidation/validateEmail:
+    post:
+      tags:
+      - email-validator
+      summary: Validate single email address
+      description: |2
+
+        Validate singleemail adddress.
+      operationId: validateEmail
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailAddressRequestBody'
+        required: true
+      responses:
+        "200":
+          description: "Sucess\n\nDetails of validated email address. \n\n**Note**: Make sure to check the complete \"status\" and \"sub_status\" properties documentation from the schema.\n"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailValidatorMailDetails'
+        "400":
+          description: |
+            Bad Request
+
+            ###### Produces:
+
+            * invalid_mail_address
+            * missing_required_parameter_email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailValidatorValidateBadRequestResponseBody'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /subaccounts/list:
+    get:
+      tags:
+      - subaccounts
+      summary: Get Subaccounts lists information
+      description: |2
+
+        List subaccounts information
+      operationId: getSubaccounts
+      parameters:
+      - name: page
+        in: query
+        description: Page number
+        required: false
+        schema:
+          $ref: '#/components/schemas/Page'
+        example: 1
+      - name: limit
+        in: query
+        description: The numbers of rows per page to return
+        required: false
+        schema:
+          $ref: '#/components/schemas/PageLimit'
+        example: 10
+      - name: filterByEmail
+        in: query
+        description: Filter by email addresses that fully/partially match the search value.
+        required: false
+        schema:
+          type: string
+          description: Filter by email addresses that fully/partially match the search value.
+          example: Jhon
+      - name: filterByActive
+        in: query
+        description: Filter by subaccount status.
+        required: false
+        schema:
+          type: boolean
+          description: Filter by subaccount status.
+          example: true
+      - name: "filterByIP[]"
+        in: query
+        description: Filter by IP Addresses.
+        required: false
+        schema:
+          type: array
+          description: Filter by IP Addresses.
+          items:
+            type: string
+      - name: orderby
+        in: query
+        description: Field to sort by
+        required: false
+        schema:
+          type: string
+          description: Field to sort by
+          example: email
+          default: email
+          enum:
+          - email
+          - last_used
+      - name: ordertype
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/OrderType'
+      responses:
+        "200":
+          description: |
+            Sucess
+
+            Subaccounts list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubAccountListSucessResponsetBody'
+        "400":
+          description: |
+            Bad Request
+
+            ###### Produces:
+
+            * page_should_be_integer
+            * page_should_be_greater_than_0
+            * limit_should_be_integer
+            * limit_should_be_greater_than_0
+            * filter_by_active_should_be_boolean
+            * ip_should_be_IPV4_format
+            * order_by_can_only_be_email_or_last_used
+            * ordertype_should_be_asc_or_desc
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+        "403":
+          description: |
+            Forbidden
+
+            The current active plan does not include this feature, upgrade is required to use this feature.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: feature_not_available_for_active_plan
+        "404":
+          description: |
+            Not Found
+
+            Page not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: page_not_found
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /subaccounts/email-exists:
+    get:
+      tags:
+      - subaccounts
+      summary: Check if account email exists in turboSMTP
+      description: |2
+
+        Check if account email exists in turboSMTP
+      operationId: checkIfAccountEmailExists
+      parameters:
+      - name: Email
+        in: query
+        description: Email address.
+        required: true
+        schema:
+          type: string
+          format: email
+        example: username@gmail.com
+      responses:
+        "200":
+          description: "Sucess\n\nReturns true if email address is already associated to a turboSMTP account. \n"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommmonResultResponseBody'
+        "400":
+          description: |
+            Bad Request
+
+            ###### Produces:
+
+            * missing_required_parameter_email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonBadRequestResponseBody'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+        "403":
+          description: |
+            Forbidden
+
+            The current active plan does not include this feature, upgrade is required to use this feature.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: feature_not_available_for_active_plan
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /subaccounts:
+    post:
+      tags:
+      - subaccounts
+      summary: Create Subaccount.
+      description: |2
+
+        Create subaccount.
+      operationId: createSubaccount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubaccountCreateRequest'
+        required: true
+      responses:
+        "201":
+          description: Sub account details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subaccount'
+        "400":
+          description: |
+            Bad Request
+
+            ###### Produces:
+
+            * email_is_already_in_use
+            * missing_required_parameter_email
+            * missing_required_parameter_first_name
+            * missing_required_parameter_last_name
+            * missing_required_parameter_password
+            * password_length_should_not_be_less_than_10_characters
+            * password_should_contain_at_least_one_uppercase_character
+            * password_should_contain_at_least_one_digit
+            * missing_required_parameter_confirm_password
+            * password_should_equal_confirm_password
+            * missing_required_parameter_ip
+            * ip_should_be_IPV4_format
+            * ip_not_associated_to_user_account
+            * policy_agree_should_be_true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonBadRequestResponseBody'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+        "403":
+          description: |
+            Forbidden
+
+            The current active plan does not include this feature, upgrade is required to use this feature.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: feature_not_available_for_active_plan
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /subaccounts/{Id}:
+    get:
+      tags:
+      - subaccounts
+      summary: Get sub account details
+      description: |2
+
+        Get sub account details.
+      operationId: getSubaccountDetails
+      parameters:
+      - name: Id
+        in: path
+        description: Id
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Sub account details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subaccount'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+        "403":
+          description: |
+            Forbidden
+
+            The current active plan does not include this feature, upgrade is required to use this feature.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: feature_not_available_for_active_plan
+        "404":
+          description: |
+            Not Found
+
+            Please verify the subaccount id is valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: subaccount_not_found
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+    patch:
+      tags:
+      - subaccounts
+      summary: Update sub account details
+      description: |2
+
+        Update sub account details.
+      operationId: updateSubaccountDetails
+      parameters:
+      - name: Id
+        in: path
+        description: Id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubaccountUpdateRequest'
+        required: true
+      responses:
+        "200":
+          description: Sub account updated sucessfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subaccount'
+        "400":
+          description: |
+            Bad Request
+
+            ###### Produces:
+
+            * password_length_should_not_be_less_than_10_characters
+            * password_should_contain_at_least_one_uppercase_character
+            * password_should_contain_at_least_one_digit
+            * password_should_equal_confirm_password
+            * ip_should_be_IPV4_format
+            * ip_not_associated_to_user_account
+            * policy_agree_should_be_true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonBadRequestResponseBody'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+        "403":
+          description: |
+            Forbidden
+
+            The current active plan does not include this feature, upgrade is required to use this feature.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: feature_not_available_for_active_plan
+        "404":
+          description: |
+            Not Found
+
+            Please verify the subaccount id is valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: subaccount_not_found
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /subaccounts/{Id}/updatesubaccountsmtplimit:
+    post:
+      tags:
+      - subaccounts
+      summary: Set subaccount smtp limit
+      description: |2
+
+        Set subaccount smtp limit.
+      operationId: UpdateSubaccountSMTPLimit
+      parameters:
+      - name: Id
+        in: path
+        description: Id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubaccountSMTPLimit'
+        required: true
+      responses:
+        "200":
+          description: Subaccount smtp limit set sucessfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubaccountActivePlan'
+        "400":
+          description: |
+            Bad Request
+
+            ###### Produces:
+
+            * missing_required_parameter_limit
+            * limit_should_be_integer
+            * limit_should_not_be_higher_than_parent_account_limit
+            * limit_should_not_be_lower_than_-1
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonBadRequestResponseBody'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+        "403":
+          description: |
+            Forbidden
+
+            The current active plan does not include this feature, upgrade is required to use this feature.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: feature_not_available_for_active_plan
+        "404":
+          description: |
+            Not Found
+
+            Please verify the subaccount id is valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: subaccount_not_found
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /subaccounts/{Id}/updatesubaccountstatus:
+    post:
+      tags:
+      - subaccounts
+      summary: Set subaccount status
+      description: |2
+
+        Set subaccount status.
+      operationId: UpdateSubaccountStatus
+      parameters:
+      - name: Id
+        in: path
+        description: Id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubaccountActiveStatus'
+        required: true
+      responses:
+        "200":
+          description: Subaccount status set sucessfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubaccountActivePlan'
+        "400":
+          description: "Bad Request\n\n###### Produces:\n\n* missing_required_parameter_active\n* active_should_be_boolean \n"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonBadRequestResponseBody'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+        "403":
+          description: |
+            Forbidden
+
+            The current active plan does not include this feature, upgrade is required to use this feature.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: feature_not_available_for_active_plan
+        "404":
+          description: |
+            Not Found
+
+            Please verify the subaccount id is valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: subaccount_not_found
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /subaccounts/authorize:
+    post:
+      tags:
+      - subaccounts
+      summary: Login to a subaccount
+      description: |2
+
+        Login to a subaccount.
+      operationId: SubaccountAuthenticationLogin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Email_1'
+        required: true
+      responses:
+        "200":
+          description: |
+            Sucess
+
+            User logged in sucessfully, use the auth value as API Key from request body in future API calls.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticationLoginSucessResponsetBody'
+        "400":
+          description: |
+            Bad Request
+
+            ###### Produces:
+
+            * missing_required_parameter_email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonBadRequestResponseBody'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+        "403":
+          description: "Forbidden\n\nEmail address or password provided are incorrect.\n\n###### Produces: \n\n* wrong_credentials_specified\n* feature_not_available_for_active_plan\n"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: wrong_credentials_specified
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /subaccounts/{Id}/active-plan:
+    get:
+      tags:
+      - subaccounts
+      summary: Get subaccount active plan.
+      description: |2
+
+        Get subaccount active plan.
+      operationId: getActivePlan
+      parameters:
+      - name: Id
+        in: path
+        description: Id
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Login successfull
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubaccountActivePlan'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+        "403":
+          description: |
+            Forbidden
+
+            The current active plan does not include this feature, upgrade is required to use this feature.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: feature_not_available_for_active_plan
+        "404":
+          description: |
+            Not Found
+
+            Please verify the subaccount id is valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: subaccount_not_found
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /subaccounts/logo:
+    get:
+      tags:
+      - subaccounts
+      summary: Get agency logo
+      description: |2
+
+        Get agency logo
+      operationId: getLogoFile
+      responses:
+        "200":
+          description: |
+            Agency Logo Url
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Logo'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+    post:
+      tags:
+      - subaccounts
+      summary: Upload agency logo
+      description: |2
+
+        Upload agency logo.
+
+        Logo must be a png or jpeg image.
+      operationId: uploadLogoFile
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: |
+            Sucess
+
+            The Logo file was successfully submitted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonSuccessResponseBody'
+        "400":
+          description: |
+            Bad Request
+
+            ###### Produces:
+
+            * missing_upload_file
+            * file_type_should_be_png_or_jpeg
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonBadRequestResponseBody'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+    delete:
+      tags:
+      - subaccounts
+      summary: Delete agency logo
+      description: |2
+
+        Delete agency logo
+      operationId: deleteLogoFile
+      responses:
+        "200":
+          description: |
+            Sucess
+
+            Logo was deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonSuccessResponseBody'
+        "404":
+          description: |
+            Not Found
+
+            Agency Logo was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: logo_not_found
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /subaccounts/agency:
+    get:
+      tags:
+      - subaccounts
+      summary: Update Agency details
+      description: |2
+
+        Get Agency details.
+      operationId: getAgencySettings
+      responses:
+        "200":
+          description: Agency details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgencySettings'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+    patch:
+      tags:
+      - subaccounts
+      summary: Update Agency details
+      description: |2
+
+        Update Agency Details
+      operationId: updateAgencySettings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BaseAgencySettings'
+        required: true
+      responses:
+        "200":
+          description: |
+            Sucess
+
+            Agency details updated sucessfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonSuccessResponseBody'
+        "400":
+          description: |
+            Bad Request
+
+            ###### Produces:
+
+            * agency_name_should_be_shorter_than_128_characters
+            * agency_website_should_be_shorter_than_128_characters
+            * agency_footer_should_be_shorter_than_2048_characters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonBadRequestResponseBody'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /tools/alerts:
+    get:
+      tags:
+      - alerts
+      summary: Get Alerts Notifications Information
+      description: |2
+
+        List Alerts Notifications Information
+      operationId: getAlerts
+      responses:
+        "200":
+          description: |
+            Sucess
+
+            Alerts list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertListSucessResponsetBody'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+    post:
+      tags:
+      - alerts
+      summary: Create new Alert Notification
+      description: |2
+
+        Create new Alert Notification
+      operationId: createAlert
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlertBase'
+        required: true
+      responses:
+        "201":
+          description: |
+            Sucess
+
+            Alert Notification Created Sucessfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Alert'
+        "400":
+          description: |
+            Bad Request
+
+            ###### Produces:
+
+            * missing_required_parameter_email
+            * missing_required_parameter_percentage
+            * percentage_should_be_integer
+            * percentage_should_not_be_less_than_0
+            * percentage_should_not_be_higher_than_100
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonBadRequestResponseBody'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /tools/alerts/{Id}:
+    get:
+      tags:
+      - alerts
+      summary: Get Alert Notification
+      description: |2
+
+        Get Alert Notification.
+      operationId: getAlert
+      parameters:
+      - name: Id
+        in: path
+        description: Id
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: |
+            Sucess
+
+            Alert Notification.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Alert'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+        "404":
+          description: |
+            Not Found
+
+            Please verify the alert id exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: alert_not_found
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+    delete:
+      tags:
+      - alerts
+      summary: Delete Alert Notification
+      description: |2
+
+        Delete an Alert Notification.
+      operationId: deleteAlert
+      parameters:
+      - name: Id
+        in: path
+        description: Id
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: |
+            Sucess
+
+            Alert was deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonSuccessResponseBody'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+        "404":
+          description: |
+            Not Found
+
+            Please verify the alert id exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: alert_not_found
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+    patch:
+      tags:
+      - alerts
+      summary: Update Alert Notification
+      description: |2
+
+        Update Alert Notification.
+      operationId: updateAlert
+      parameters:
+      - name: Id
+        in: path
+        description: Id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlertBase'
+        required: true
+      responses:
+        "200":
+          description: |
+            Sucess
+
+            Alert updated sucessfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Alert'
+        "400":
+          description: |
+            Bad Request
+
+            ###### Produces:
+
+            * percentage_should_be_integer
+            * percentage_should_not_be_less_than_0
+            * percentage_should_not_be_higher_than_100
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonBadRequestResponseBody'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+        "404":
+          description: |
+            Not Found
+
+            Please verify the alert id exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: alert_not_found
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /analytics:
+    get:
+      tags:
+      - analytics
+      summary: Get Analytics Data
+      description: |
+        Get Analytics Data
+      operationId: getAnalyticsData
+      parameters:
+      - name: page
+        in: query
+        description: Page number
+        required: false
+        schema:
+          $ref: '#/components/schemas/Page'
+        example: 1
+      - name: limit
+        in: query
+        description: The numbers of rows per page to return
+        required: false
+        schema:
+          $ref: '#/components/schemas/PageLimit'
+        example: 10
+      - name: from
+        in: query
+        description: Start date
+        required: true
+        schema:
+          $ref: '#/components/schemas/FromDate'
+        example: 2020-01-01
+      - name: to
+        in: query
+        description: End date
+        required: true
+        schema:
+          $ref: '#/components/schemas/ToDate'
+        example: 2025-12-31
+      - name: "status[]"
+        in: query
+        description: "Filter by Status\n\n    NEW: email has been queued for delivery\n    DEFER: email is in the queue for delivery\n    SUCCESS: email has been delivered.\n    OPEN: email has been opened.\n    CLICK: email has been clicked.\n    REPORT: email has been reported as spam.\n    FAIL: email has bounced.\n    SYSFAIL: email was dropped.\n    UNSUB: email is unsubscribed.\n\n<br />\nNotice that emails that fall into the above statuses can be grouped, ie Turbo-Smtp uses the following groups:\n<br />\n\n    'Clicks' = 'CLICK',\n    'Unsubscribes' = 'UNSUB',\n    'Spam' = 'REPORT',\n    'Drop' = 'SYSFAIL',\n    'Queued' = 'NEW' or 'DEFER',\n    'Opens'= 'OPEN' or 'CLICK' or 'UNSUB' or 'REPORT',\n    'Delivered'= 'SUCCESS'  or 'OPEN' or 'CLICK' or 'UNSUB' or 'REPORT',\n    'Bounce': 'FAIL'.  \n"
+        required: false
+        schema:
+          type: array
+          description: Filter by Status
+          items:
+            $ref: '#/components/schemas/AnalyticMailStatus'
+      - name: filter_by
+        in: query
+        description: Filter by
+        required: false
+        schema:
+          $ref: '#/components/schemas/AnalyticFilterBy'
+      - name: filter
+        in: query
+        description: "Text to search (recipient, sender, email subject or reason for suppression)"
+        required: false
+        schema:
+          $ref: '#/components/schemas/Filter'
+        examples:
+          bysubject:
+            summary: Search for email subject.
+            value: September 2022
+          bysender:
+            summary: Search for emai sender.
+            value: Sales@gmail.com
+          byrecipient:
+            summary: Search for emai recipient.
+            value: Jhon.Doe@gmail.com
+          bydomain:
+            summary: Search for recipient email domain.
+            value: gmail.com
+      - name: smart_search
+        in: query
+        description: Smart search
+        required: false
+        schema:
+          $ref: '#/components/schemas/SmartSearch'
+        example: false
+      - name: orderby
+        in: query
+        description: Order by
+        required: false
+        schema:
+          $ref: '#/components/schemas/AnalyticOrderBy'
+      - name: ordertype
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/OrderType'
+      - name: tz
+        in: query
+        description: Timezone Offset
+        schema:
+          $ref: '#/components/schemas/Timezone'
+        example: -07:00
+      responses:
+        "200":
+          description: |
+            Sucess
+
+            Get Analytics Data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsListSucessResponsetBody'
+        "400":
+          description: "Bad Request\n\n###### Produces:\n\n* page_should_be_integer\n* page_should_be_greater_than_0\n* limit_should_be_integer\n* limit_should_be_greater_than_0\n* missing_required_parameter_from\n* from_format_should_be_yyyy-mm-dd\n* missing_required_parameter_to\n* to_format_should_be_yyyy-mm-dd\n* missing_required_parameter_filter_by\n* invalid_status_value\n* filter_by_can_only_be_subject_or_sender_or_recipient_or_domain\n* smart_search_should_be_true_or_false\n* orderby_can_only_be_subject_or_sender_or_recipient_or_domain\n* ordertype_should_be_asc_or_desc                  \n"
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /analytics/csv:
+    get:
+      tags:
+      - analytics
+      summary: Export Analytics data in CSV file
+      description: |
+        Export Analytics data in CSV file
+      operationId: exportAnalyticsDataCSV
+      parameters:
+      - name: from
+        in: query
+        description: Start date
+        required: true
+        schema:
+          $ref: '#/components/schemas/FromDate'
+        example: 2020-01-01
+      - name: to
+        in: query
+        description: End date
+        required: true
+        schema:
+          $ref: '#/components/schemas/ToDate'
+        example: 2025-12-31
+      - name: "status[]"
+        in: query
+        description: "Filter by Status\n\n    NEW: email has been queued for delivery\n    DEFER: email is in the queue for delivery\n    SUCCESS: email has been delivered.\n    OPEN: email has been opened.\n    CLICK: email has been clicked.\n    REPORT: email has been reported as spam.\n    FAIL: email has bounced.\n    SYSFAIL: email was dropped.\n    UNSUB: email is unsubscribed.\n\n<br />\nNotice that emails that fall into the above statuses can be grouped, ie Turbo-Smtp uses the following groups:\n<br />\n\n    'Clicks' = 'CLICK',\n    'Unsubscribes' = 'UNSUB',\n    'Spam' = 'REPORT',\n    'Drop' = 'SYSFAIL',\n    'Queued' = 'NEW' or 'DEFER',\n    'Opens'= 'OPEN' or 'CLICK' or 'UNSUB' or 'REPORT',\n    'Delivered'= 'SUCCESS'  or 'OPEN' or 'CLICK' or 'UNSUB' or 'REPORT',\n    'Bounce': 'FAIL'.  \n"
+        required: false
+        schema:
+          type: array
+          description: Filter by Status
+          items:
+            $ref: '#/components/schemas/AnalyticMailStatus'
+      - name: filter_by
+        in: query
+        description: Filter by
+        required: false
+        schema:
+          $ref: '#/components/schemas/AnalyticFilterBy'
+      - name: filter
+        in: query
+        description: "Text to search (recipient, sender, email subject or reason for suppression)"
+        required: false
+        schema:
+          $ref: '#/components/schemas/Filter'
+        examples:
+          bysubject:
+            summary: Search for email subject.
+            value: September 2022
+          bysender:
+            summary: Search for emai sender.
+            value: Sales@gmail.com
+          byrecipient:
+            summary: Search for emai recipient.
+            value: Jhon.Doe@gmail.com
+          bydomain:
+            summary: Search for recipient email domain.
+            value: gmail.com
+      - name: smart_search
+        in: query
+        description: Smart search
+        required: false
+        schema:
+          $ref: '#/components/schemas/SmartSearch'
+        example: false
+      - name: orderby
+        in: query
+        description: Order by
+        required: false
+        schema:
+          $ref: '#/components/schemas/AnalyticOrderBy'
+      - name: ordertype
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/OrderType'
+      - name: tz
+        in: query
+        description: Timezone Offset
+        schema:
+          $ref: '#/components/schemas/Timezone'
+        example: -07:00
+      responses:
+        "200":
+          description: Analytics CSV data
+          content:
+            text/csv:
+              schema:
+                type: string
+                example: |
+                  1871534200146968576,DEFER,"Fwd: Test",test@emailchef.com,test@live.com,"Wednesday, February 21 2024 7:48 AM"," Connected to 104.47.51.161 but connection died. (#4.4.2)
+                  1871533807186821120,DEFER,"Test send",test@emailchef.com,test@live.com,"Wednesday, February 21 2024 7:47 AM"," Connected to 104.47.55.161 but connection died. (#4.4.2)
+        "400":
+          description: "Bad Request\n\n###### Produces:\n\n* missing_required_parameter_from\n* from_format_should_be_yyyy-mm-dd\n* missing_required_parameter_to\n* to_format_should_be_yyyy-mm-dd\n* missing_required_parameter_filter_by\n* invalid_status_value\n* filter_by_can_only_be_subject_or_sender_or_recipient_or_domain\n* smart_search_should_be_true_or_false\n* orderby_can_only_be_subject_or_sender_or_recipient_or_domain\n* ordertype_should_be_asc_or_desc                  \n"
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /analytics/{Id}:
+    get:
+      tags:
+      - analytics
+      summary: Get Analytics Single Item by ID
+      description: |
+        Get Analytics Data by ID
+      operationId: getAnalyticsDataByID
+      parameters:
+      - name: Id
+        in: path
+        description: Id
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: |
+            Sucess
+
+            Response body contains the Analytic Item requested by ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticMailItem'
+        "400":
+          description: |
+            Bad Request
+
+            ###### Produces:
+
+            * XXXXXXX
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonBadRequestResponseBody'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+        "404":
+          description: |
+            Not Found
+
+            The Analytic ID was not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: XXXXX
+      security:
+      - ApiKeyAuth: []
+      - consumerKey: []
+        consumerSecret: []
+  /user/consumerKeys:
+    get:
+      tags:
+      - consumerkey
+      summary: Get Consumer Keys list
+      description: |2
+
+        Get Consumer Keys list
+
+        Note: Consumer Keys listing is not allwed when authenticated via Consumer Key.
+      operationId: listConsumerKeys
+      responses:
+        "200":
+          description: |
+            Sucess
+
+            Consumer Keys list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsumerKeyListSucessResponsetBody'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+      security:
+      - ApiKeyAuth: []
+    post:
+      tags:
+      - consumerkey
+      summary: Create Consumer Key
+      description: |2
+
+        Create new Consumer Key
+
+        Note: Consumer Key creation is not allwed when authenticated via Consumer Key.
+      operationId: createConsumerKey
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsumerKeyCreateRequestBody'
+        required: true
+      responses:
+        "201":
+          description: |
+            Sucess
+
+            Consumer Key Created Sucessfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsumerKeyCreateResponseBody'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+      security:
+      - ApiKeyAuth: []
+  /user/consumerKeys/{consumerKey}:
+    delete:
+      tags:
+      - consumerkey
+      summary: Delete Consumer Key
+      description: |2
+
+        Delete Consumer Key
+        Note: Consumer Key deletion is not allwed when authenticated via Comsumer Key.
+      operationId: deleteConsumerKey
+      parameters:
+      - name: consumerKey
+        in: path
+        description: Consumer Key
+        required: true
+        schema:
+          type: string
+          example: b914ad238d0e8e8851b81e86ce46ae1d
+      responses:
+        "200":
+          description: |
+            Sucess
+
+            Consumer Key was deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonSuccessResponseBody'
+        "401":
+          description: |
+            Unauthorized
+
+            This API requires a valid API Key to be provided.
+            (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+            Produces:
+
+            * missing_authorization_key
+            * invalid_authorization_key
+            * account_is_inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+              examples:
+                MissingAuthorizationKey:
+                  summary: Missing Authorization Key
+                  value:
+                    message: missing_authorization_key
+                InvalidAuthorizationKey:
+                  summary: Invalid / Expired Authorization Key
+                  value:
+                    message: invalid_authorization_key
+        "404":
+          description: |
+            Not Found
+
+            Please verify the Consumer Key is valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonMessageResponseBody'
+              example:
+                message: key_not_found
+      security:
+      - ApiKeyAuth: []
+components:
+  schemas:
+    AuthenticationLoginSucessResponsetBody:
+      properties:
+        auth:
+          type: string
+          description: API Key to be used in authorization header
+      example:
+        auth: f8efa7be4e7457c463e8b800e1f11f92072d272c
+    CommonBadRequestResponseBody:
+      properties:
+        message:
+          type: string
+          enum:
+          - missing_required_parameter
+      example:
+        message: missing_required_parameter
+    CommonMessageResponseBody:
+      type: object
+      properties:
+        message:
+          type: string
+    AuthenticationLoginRequestBody:
+      required:
+      - email
+      - password
+      properties:
+        email:
+          type: string
+          description: The email of turboSMTP account
+          format: email
+        password:
+          type: string
+          description: The password of turboSMTP account
+          writeOnly: true
+        no_expire:
+          type: boolean
+          description: " **false**: \nauthentication will expire after 2 hours.\n\n**true**: \nauthentication will keep you signed in, and will never expire. (Use [/authentication/deauthorize](#/authentication/AuthenticationLogout) to logout and release your an API Key)"
+          default: false
+      example:
+        email: developer@yourdomain.com
+        password: yourTurboSmtpPassword
+        no_expire: true
+    AuthorizationError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - missing_authorization_key
+          - invalid_authorization_key
+    CommonSuccessResponseBody:
+      properties:
+        message:
+          type: string
+          enum:
+          - success
+      example:
+        message: success
+    ChangePasswordBadRequestResponseBody:
+      properties:
+        message:
+          type: string
+          enum:
+          - empty_request_body
+          - password_is_missing
+          - confirm_password_is_missing
+          - current_password_is_missing
+          - current_password_can_not_be_empty
+          - password_should_equal_confirm_password
+          - new_password_should_not_equal_current_password
+      example:
+        message: new_password_should_not_equal_current_password
+    ChangePasswordRequestBody:
+      required:
+      - confirm_password
+      - current_password
+      - password
+      properties:
+        current_password:
+          type: string
+          description: Current Password.
+        password:
+          type: string
+          description: New Password to be used.
+        confirm_password:
+          type: string
+          description: New Password to be used.
+      example:
+        current_password: 6SwHbc96dyE8
+        password: SMkhhf4J686P
+        confirm_password: SMkhhf4J686P
+    CheckValidityTokenResetPasswordBadRequestResponseBody:
+      properties:
+        message:
+          type: string
+          enum:
+          - forgot_password_token_is_missing
+      example:
+        message: forgot_password_token_is_missing
+    UpdateResetPasswordBadRequestResponseBody:
+      properties:
+        message:
+          type: string
+          enum:
+          - empty_request_body
+          - password_is_missing
+          - confirm_password_is_missing
+          - current_password_is_missing
+          - current_password_can_not_be_empty
+          - password_should_equal_confirm_password
+          - new_password_should_not_equal_current_password
+      example:
+        message: new_password_should_not_equal_current_password
+    UpdateResetPasswordRequestBody:
+      required:
+      - confirm_password
+      - password
+      - token
+      properties:
+        password:
+          type: string
+          description: New Password to be used.
+        confirm_password:
+          type: string
+          description: New Password to be used.
+        token:
+          type: string
+          description: Reset Password Token
+      example:
+        password: SMBBBf4J686P
+        confirm_password: SMBBBf4J686P
+        token: 781d4b44aaf5de86dc0a7e1ca2dc409f
+    SendSecretTokenResetPasswordBadRequestResponseBody:
+      properties:
+        message:
+          type: string
+          enum:
+          - empty_request_body
+          - missing_required_parameter_email
+      example:
+        message: missing_required_parameter
+    SendSecretTokenResetPasswordRequestBody:
+      required:
+      - email
+      properties:
+        email:
+          type: string
+          description: turboSMTP account email address.
+          format: email
+          example: developer@turboSMTP.com
+      example:
+        email: developer@turboSMTP.com
+    SendSucessResponsetBody:
+      properties:
+        message:
+          type: string
+          example: OK
+        mid:
+          maximum: 9999999999999999999
+          minimum: 0
+          type: integer
+          description: message ID
+          format: int64
+          example: 1688566310828572700
+    SendBadRequestResponseBody:
+      properties:
+        message:
+          type: string
+          example: error
+        errors:
+          type: array
+          properties:
+            lenght:
+              type: integer
+          example:
+          - missing or not valid sender email (from)
+          items:
+            type: string
+    SendUnauthorizedResponseBody:
+      properties:
+        errorCode:
+          type: integer
+          example: 3
+        message:
+          type: string
+          example: Invalid authorization token
+        details:
+          type: string
+          example: "No authorization key was specified for request: POST /api/mail/send"
+    EmailRequestBody:
+      allOf:
+      - $ref: '#/components/schemas/Authentication'
+      - $ref: '#/components/schemas/Email'
+    Authentication:
+      type: object
+      properties:
+        authuser:
+          type: string
+          description: email of turboSMTP account
+          format: email
+          nullable: true
+        authpass:
+          type: string
+          description: password of turboSMTP account
+          nullable: true
+          writeOnly: true
+    Email:
+      type: object
+      properties:
+        from:
+          type: string
+          description: from mail address
+          format: email
+        to:
+          type: string
+          description: comma-separated recipients emails list
+        subject:
+          type: string
+          description: email subject
+          nullable: true
+        cc:
+          type: string
+          description: comma-separated copy emails list
+          nullable: true
+        bcc:
+          type: string
+          description: comma-separated hidden copy emails list
+          nullable: true
+        content:
+          type: string
+          description: text content of the email
+          nullable: true
+        html_content:
+          type: string
+          description: html content of the email
+          nullable: true
+        custom_headers:
+          type: object
+          additionalProperties:
+            type: string
+          description: "email additional headers, use any additional header like standard ones List-Unsubscribe (to allow users to easily unsubscribe), X-Entity-Ref-ID (to handle how gmail and other clients group threads), and your own ones. \n"
+          nullable: true
+        reference_id:
+          type: string
+          description: custom argument included within an email to be added to the Event Webhook response.
+          nullable: true
+        mime_raw:
+          type: string
+          description: mime message which replaces content and hmtl content
+          nullable: true
+        attachments:
+          type: array
+          properties:
+            lenght:
+              type: integer
+          description: array of attachment objects
+          items:
+            $ref: '#/components/schemas/attachment'
+    attachment:
+      type: object
+      properties:
+        content:
+          type: string
+          description: Base64 encoded content of the attachment
+          example: dXBsb2FkZXIxQGdtYWlsLmNvbQ0KdXBsb2FkZXIyQGdtYWlsLmNvbQ0KYWJjMQ==
+        name:
+          type: string
+          description: filename of the attachment
+          example: email.ico
+        type:
+          type: string
+          description: mime type of the content you are attaching
+          example: image/gif
+    SuppressionUploadResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        valid:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailAddress'
+        invalid:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailAddress'
+      example:
+        status: success
+        valid:
+        - valid.email.1@gmail.com
+        - valid.email.2@gmail.com
+        invalid:
+        - invalidemailline
+    EmailAddress:
+      type: string
+      format: email
+      example: username@gmail.com
+    SuppressionUploadBadRequestResponseBody:
+      type: object
+      properties:
+        res:
+          type: string
+    SuppressionImportJson:
+      type: object
+      properties:
+        type:
+          type: string
+          example: manual
+          enum:
+          - manual
+        reason:
+          type: string
+          description: Specifies a reason for suppressing imported email address/addresses
+        content:
+          type: array
+          description: List of email addresses to suppress.
+          items:
+            type: string
+    SuppressionImportFile:
+      type: object
+      properties:
+        type:
+          type: string
+          example: file
+          enum:
+          - file
+        reason:
+          type: string
+          description: Specifies a reason for suppressing imported email address/addresses
+        file:
+          type: string
+          format: binary
+          enum:
+          - csv
+          - txt
+    SuppressionsSucessResponsetBody:
+      type: object
+      properties:
+        count:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Suppression'
+      example:
+        count: 5
+        results:
+        - date: 2021-03-17 00:00:00
+          sender: andrea@emailchef.com
+          source: bounce
+          subject: Newsletter - September 2022
+          recipient: bounce1@turbo-smtp.com
+          reason: 550 Error
+        - date: 2021-03-15 00:00:00
+          sender: alberto@emailchef.com
+          source: manual
+          subject: ""
+          recipient: bounce2@turbo-smtp.com
+          reason: manual inserted
+        - date: 2021-03-14 00:00:00
+          sender: alberto@emailchef.com
+          source: spam
+          subject: Newsletter - September 2022
+          recipient: topolino@turbo-smtp.com
+          reason: spam complaint
+        - date: 2021-03-14 00:00:00
+          sender: alberto@emailchef.com
+          source: unsubscribe
+          subject: Newsletter - September 2022
+          recipient: pippo@turbo-smtp.com
+          reason: unsubscribe from list pippo
+        - date: 2021-03-13 00:00:00
+          sender: alberto@emailchef.com
+          source: validation_failed
+          subject: Newsletter - September 2022
+          recipient: minnie@turbo-smtp.com
+          reason: validation failed last import
+    Suppression:
+      type: object
+      properties:
+        date:
+          pattern: "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})"
+          type: string
+          example: 2021-03-17 00:00:00
+        sender:
+          type: string
+          format: email
+          nullable: true
+        source:
+          $ref: '#/components/schemas/SuppressionSource'
+        subject:
+          type: string
+          example: September Newsletter
+        recipient:
+          type: string
+          format: email
+          nullable: true
+        reason:
+          type: string
+          nullable: true
+          example: 550 Error
+    SuppressionSource:
+      type: string
+      enum:
+      - manual
+      - bounce
+      - spam
+      - unsubscribe
+      - validation_failed
+    SuppressionFilterOrderPageRequestBody:
+      allOf:
+      - type: object
+        properties:
+          page:
+            $ref: '#/components/schemas/Page'
+          limit:
+            $ref: '#/components/schemas/PageLimit'
+      - $ref: '#/components/schemas/SuppressionFilterOrderRequestBody'
+    Page:
+      minimum: 1
+      type: integer
+      description: Page number
+      nullable: true
+      example: 1
+      default: 1
+    PageLimit:
+      minimum: 1
+      type: integer
+      description: The numbers of rows per page to return
+      nullable: true
+      example: 10
+      default: 10
+    SuppressionFilterOrderRequestBody:
+      allOf:
+      - $ref: '#/components/schemas/SuppressionFilterRequestBody'
+      - type: object
+        properties:
+          orderby:
+            $ref: '#/components/schemas/SuppressionOrderBy'
+          ordertype:
+            $ref: '#/components/schemas/OrderType'
+    SuppressionFilterRequestBody:
+      required:
+      - from
+      - to
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/FromDate'
+        to:
+          $ref: '#/components/schemas/ToDate'
+        tz:
+          $ref: '#/components/schemas/Timezone'
+        filter:
+          $ref: '#/components/schemas/Filter'
+        filter_by:
+          $ref: '#/components/schemas/SuppressionFilterBy'
+        smart_search:
+          $ref: '#/components/schemas/SmartSearch'
+        restrict:
+          $ref: '#/components/schemas/SuppressionRestrictions'
+    FromDate:
+      type: string
+      description: Start date
+      format: date
+      example: 2020-01-01
+    ToDate:
+      type: string
+      description: End date
+      format: date
+      example: 2025-12-31
+    Timezone:
+      type: string
+      description: Timezone Offset
+      example: -07:00
+    Filter:
+      type: string
+      description: Query to search
+      example: ""
+    SuppressionFilterBy:
+      type: array
+      properties:
+        length:
+          type: integer
+      description: Filter by
+      example: ""
+      items:
+        $ref: '#/components/schemas/SuppressionSource'
+    SmartSearch:
+      type: boolean
+      description: Smart search
+      nullable: true
+      example: false
+      default: false
+    SuppressionRestrictions:
+      type: array
+      description: xxxx
+      items:
+        $ref: '#/components/schemas/SuppressionRestriction'
+    SuppressionRestriction:
+      type: object
+      properties:
+        by:
+          $ref: '#/components/schemas/SuppressionRestrictBy'
+        operator:
+          $ref: '#/components/schemas/SuppressionOperator'
+        filter:
+          type: string
+          example: a
+        smart_search:
+          $ref: '#/components/schemas/SmartSearch'
+      description: Restriction
+    SuppressionRestrictBy:
+      type: string
+      description: Field to restrict by
+      example: sender
+      enum:
+      - sender
+      - recipient
+      - reason
+      - subject
+    SuppressionOperator:
+      type: string
+      description: XXX
+      example: include
+      enum:
+      - include
+      - exclude
+    SuppressionOrderBy:
+      type: string
+      description: Field to sort by
+      example: date
+      default: date
+      enum:
+      - date
+      - source
+      - recipient
+      - reason
+    OrderType:
+      type: string
+      description: Order Ascending or Descending.
+      example: desc
+      default: desc
+      enum:
+      - asc
+      - desc
+    SuppressionFilter:
+      type: string
+      description: Query to search
+      example: ""
+    SuppressionsDeleteSuccess:
+      type: object
+      properties:
+        success:
+          type: boolean
+      example:
+        success: true
+    SuppressionBulkDeleteRequestBody:
+      type: array
+      items:
+        type: string
+        format: email
+    CountryList:
+      type: array
+      example:
+      - iso_code: AF
+        currency: AFN
+        flag: 🇦🇫
+        name: Afghanistan
+        phonecode: "93"
+      - iso_code: AX
+        currency: EUR
+        flag: 🇦🇽
+        name: Aland Islands
+        phonecode: +358-18
+      - iso_code: AL
+        currency: ALL
+        flag: 🇦🇱
+        name: Albania
+        phonecode: "355"
+      items:
+        $ref: '#/components/schemas/Country'
+    Country:
+      type: object
+      properties:
+        iso_code:
+          type: string
+          example: US
+        currency:
+          type: string
+          example: USD
+        flag:
+          type: string
+          example: 🇺🇸
+        name:
+          type: string
+          example: United States
+        phonecode:
+          type: string
+          example: "1"
+    StateList:
+      type: array
+      example:
+      - name: Alabama
+        iso_code: AL
+        country_code: US
+        type: null
+      - name: Alaska
+        iso_code: AK
+        country_code: US
+        type: null
+      - name: American Samoa
+        iso_code: AS
+        country_code: US
+        type: null
+      items:
+        $ref: '#/components/schemas/State'
+    State:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Alabama
+        iso_code:
+          type: string
+          example: AL
+        country_code:
+          type: string
+          example: US
+        type:
+          type: string
+          example: null
+    BuyEmailValidatorCreditsSucessResponse:
+      type: object
+      properties:
+        url:
+          type: string
+          description: Url to complete payment
+          example: http://bs.dev.serversmtp.com/index.php/guest/payment_information/form/amsyUJvFeW0fkjLqbcTKMCBRZDi2AdIH
+    BuyEmailValidatorCreditsBadRequestResponseBody:
+      properties:
+        message:
+          type: string
+          enum:
+          - missing_required_parameter_amount
+          - amount_should_be_integer
+          - amount_should_not_be_less_than_15
+          - amount_should_not_be_higher_than_1800
+      example:
+        message: amount_should_be_integer
+    BuyEmailValidatorCreditsRequest:
+      type: object
+      properties:
+        amount:
+          type: integer
+          description: Amount of money to use for purchase
+          example: 320
+    EmailValidatorSubscription:
+      required:
+      - currency
+      - free_credits
+      - free_credits_used
+      - last_used_period
+      - latest_period_start_date
+      - paid_credits
+      - period_expiration_date
+      - remaining_paid_credits
+      type: object
+      properties:
+        currency:
+          $ref: '#/components/schemas/Currency'
+        free_credits:
+          minimum: 0
+          type: integer
+          description: Ammount of allocated free credits.
+          format: int32
+          example: 3000
+        free_credits_used:
+          minimum: 0
+          type: integer
+          description: Ammount of used free credits.
+          format: int32
+          example: 200
+        last_used_period:
+          pattern: "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})"
+          type: string
+          description: Last time credit was used.
+          nullable: true
+          example: 2022-11-20 00:00:00
+        latest_period_start_date:
+          pattern: "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})"
+          type: string
+          description: Free credit period start date (renewed each cycle).
+          nullable: true
+          example: 2022-11-09 00:00:00
+        period_expiration_date:
+          pattern: "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})"
+          type: string
+          description: Free credit period expiration date.
+          nullable: true
+          example: 2022-12-09 00:00:00
+        paid_credits:
+          minimum: 0
+          type: number
+          description: Amount of remaining money specified in the 'currency' field value currency.
+          format: currency
+          example: 437.456
+        remaining_free_credit:
+          minimum: 0
+          type: integer
+          description: Ammount of remaining free credits.
+          format: int32
+          example: 2800
+    Currency:
+      type: string
+      description: Currency
+      example: $
+      enum:
+      - $
+      - €
+      - £
+      x-enum-varnames:
+      - Dollar
+      - Euro
+      - Pound
+    EmailValidationUploadResponse:
+      type: object
+      properties:
+        list_id:
+          type: integer
+          description: List Identifier
+          example: 10093
+        total_emails:
+          type: integer
+          description: Total emails found in uploaded file
+          example: 314
+    EmailValidatorUploadBadRequestResponseBody:
+      properties:
+        message:
+          type: string
+          enum:
+          - "missing_upload_file,invalid_mail_address_list"
+      example:
+        message: missing_upload_file
+    EmailValidatorSucessResponsetBody:
+      type: object
+      properties:
+        count:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailValidatorList'
+      example:
+        count: 2
+        results:
+        - id: 2406
+          creation_time: 2021-03-17 00:00:00
+          file_name: BusinessProspects.txt
+          is_processed: true
+          percentage: 100
+          total_emails: 158
+          total_processed: 158
+        - id: 2407
+          creation_time: 2021-03-21 00:00:00
+          file_name: OldContacts.txt
+          is_processed: false
+          percentage: 0
+          total_emails: 158
+          total_processed: 0
+    EmailValidatorList:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Email validation list id.
+          example: 2406
+        creation_time:
+          pattern: "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})"
+          type: string
+          description: Date and Time of the validation list creation.
+          example: 2021-03-17 08:56:00
+        file_name:
+          type: string
+          description: File name of the uploaded file.
+          example: BusinessProspects.txt
+        is_processed:
+          type: boolean
+          description: True if the validation list was already processed.
+          example: true
+        percentage:
+          type: integer
+          description: Describes the percentage progress of validation list.
+          example: 83
+        total_emails:
+          type: integer
+          description: Amount of email addresses in the validation list.
+          example: 314
+        total_processed:
+          type: integer
+          description: Describes the count of email addresses processed so far.
+          example: 28
+        status_summary:
+          type: array
+          example:
+          - status: valid
+            total: 2
+          - status: invalid
+            total: 5
+          items:
+            $ref: '#/components/schemas/EmailValidatorStatusSummaryItem'
+    EmailValidatorStatusSummaryItem:
+      type: object
+      properties:
+        status:
+          type: string
+          description: "\nThe status of the email address you are validating.\n\n  DELIVERABILITY STATUS EXPLANATION\n\n  valid:\n  These are emails that were determined to be valid and safe to email to, they will have a very low bounce rate of under 2%. If you receive bounces it can be because your IP might be blacklisted where our IP was not. Sometimes the email accounts exist, but they are only accepting mail from people in their contact lists. Sometimes you will get throttle on number of emails you can send to a specific domain per hour. It's important to look at the SMTP Bounce codes to determine why.\n  \n  invalid:\n  These are emails that were determined to be invalid, please delete them from your mailing list.\n  \n  catch-all: \n  These emails are impossible to validate without sending a real email and waiting for a bounce. The term Catch-all means that the email server tells you that the email is valid, whether it's valid or invalid. If you want to email these addresses, we suggest you segment them into a catch-all group and be aware that some of these will most likely bounce.\n  \n  spamtrap: \n  These emails are believed to be spamtraps and should not be mailed. We have technology in place to determine if certain emails should be classified as spamtrap. We don't know all the spamtrap email addresses, but we do know a lot of them.\n  \n  abuse: \n  These emails belong to people who are known to click the abuse links in emails, hence abusers or complainers. We recommend not emailing these addresses.\n  \n  do_not_mail: \n  These emails belong to companies, role-based, or people you just want to avoid emailing to. They are broken down into 6 sub-categories \"disposable\",\"toxic\", \"role_based\", \"role_based_catch_all\", \"global_suppression\" and \"possible_trap\". You should decide if you want to email these address. They are valid email addresses, but shouldn't be mailed in most cases.\n  \n  unknown: \n  These emails we weren't able to validate for one reason or another. Typical cases are \"Their mail server was down\" or \"the anti-spam system is blocking us\". In most cases, 80% unknowns are invalid/bad email addresses.\n"
+          example: valid
+          enum:
+          - valid
+          - invalid
+          - catch-all
+          - unknown
+          - spamtrap
+          - abuse
+          - do_not_mail
+        total:
+          type: integer
+          description: Ammount of emails in the status within the list.
+          example: 12
+    EmailValidatorListDeleteSuccess:
+      type: object
+      properties:
+        success:
+          type: boolean
+      example:
+        success: true
+    EmailValidatorValidateListBadRequestResponseBody:
+      properties:
+        message:
+          type: string
+          enum:
+          - list_already_validated
+          - insufficient_credit
+      example:
+        message: list_already_validated
+    EmailValidatorValidatedMailsResults:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: Count of vaidated email addresses in the list.
+        processed:
+          type: integer
+          description: Number of processed email addresses in the list.
+        results:
+          type: array
+          properties:
+            lenght:
+              type: integer
+          description: Array of validated email addresses in the list.
+          items:
+            $ref: '#/components/schemas/EmailValidatorMailDetailsBasic'
+    EmailValidatorMailDetailsBasic:
+      allOf:
+      - $ref: '#/components/schemas/Email_1'
+      - type: object
+        properties:
+          id:
+            type: integer
+            description: the id of the email address
+            example: 2047
+      - $ref: '#/components/schemas/EmailValidatorMailSharedDetails'
+    Email_1:
+      required:
+      - email
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: username@gmail.com
+    EmailValidatorMailSharedDetails:
+      type: object
+      properties:
+        status:
+          type: string
+          description: "\nThe status of the email address you are validating.\n\n  DELIVERABILITY STATUS EXPLANATION\n\n  valid:\n  These are emails that were determined to be valid and safe to email to, they will have a very low bounce rate of under 2%. If you receive bounces it can be because your IP might be blacklisted where our IP was not. Sometimes the email accounts exist, but they are only accepting mail from people in their contact lists. Sometimes you will get throttle on number of emails you can send to a specific domain per hour. It's important to look at the SMTP Bounce codes to determine why.\n  \n  invalid:\n  These are emails that were determined to be invalid, please delete them from your mailing list.\n  \n  catch-all: \n  These emails are impossible to validate without sending a real email and waiting for a bounce. The term Catch-all means that the email server tells you that the email is valid, whether it's valid or invalid. If you want to email these addresses, we suggest you segment them into a catch-all group and be aware that some of these will most likely bounce.\n  \n  spamtrap: \n  These emails are believed to be spamtraps and should not be mailed. We have technology in place to determine if certain emails should be classified as spamtrap. We don't know all the spamtrap email addresses, but we do know a lot of them.\n  \n  abuse: \n  These emails belong to people who are known to click the abuse links in emails, hence abusers or complainers. We recommend not emailing these addresses.\n  \n  do_not_mail: \n  These emails belong to companies, role-based, or people you just want to avoid emailing to. They are broken down into 6 sub-categories \"disposable\",\"toxic\", \"role_based\", \"role_based_catch_all\", \"global_suppression\" and \"possible_trap\". You should decide if you want to email these address. They are valid email addresses, but shouldn't be mailed in most cases.\n  \n  unknown: \n  These emails we weren't able to validate for one reason or another. Typical cases are \"Their mail server was down\" or \"the anti-spam system is blocking us\". In most cases, 80% unknowns are invalid/bad email addresses.\n"
+          example: valid
+          enum:
+          - valid
+          - invalid
+          - catch-all
+          - unknown
+          - spamtrap
+          - abuse
+          - do_not_mail
+        sub_status:
+          type: string
+          description: "The sub-status of the email address you are validating.\n\nalias_address: \n(valid) These emails addresses act as forwarders/aliases and are not real inboxes, for example if you send an email to forward@example.com and then the email is forwarded to realinbox@example.com. It's a valid email address and you can send to them, it's just a little more information about the email address. We can sometimes detect alias email addresses and when we do we let you know.\n\nantispam_system: \n(unknown) These emails have anti-spam systems deployed that are preventing us from validating these emails.\n\ndoes_not_accept_mail: \n(invalid) These domains only send mail and don't accept incoming mail.\n\nexception_occurred: \n(unknown) These emails caused an exception when validating.\n\nfailed_smtp_connection: \n(unknown) These emails belong to a mail server that won't allow an SMTP connection. Most of the time, these emails will end up being invalid.\n\nfailed_syntax_check: \n(Invalid) Emails that fail RFC syntax protocols\n\nforcible_disconnect: \n(Unknown) These emails belong to a mail server that disconnects immediately upon connecting. Most of the time, these emails will end up being invalid.\nglobal_suppression: \n(do_not_mail) These emails are found in many popular global suppression lists (GSL), they consist of known ISP complainers, direct complainers, purchased addresses, domains that don't send mail, and known litigators.\n\ngreylisted: \n(Unknown) Emails where we are temporarily unable to validate them. A lot of times if you resubmit these emails they will validate on a second pass.\n\nleading_period_removed: \n(valid) If a valid gmail.com email address starts with a period '.' we will remove it, so the email address is compatible with all mailing systems.\n\nmail_server_did_not_respond- \n(unknown) These emails belong to a mail server that is not responding to mail commands. Most of the time, these emails will end up being invalid.\n\nmail_server_temporary_error: \n(unknown) These emails belong to a mail server that is returning a temporary error. Most of the time, these emails will end up being invalid.\nmailbox_quota_exceeded: \n(invalid) These emails exceeded their space quota and are not accepting emails. These emails are marked invalid.\n\nmailbox_not_found: \n(invalid) These emails addresses are valid in syntax, but do not exist. These emails are marked invalid.\n\nno_dns_entries: \n(invalid) These emails are valid in syntax, but the domain doesn't have any records in DNS or have incomplete DNS Records. Therefore, mail programs will be unable to or have difficulty sending to them. These emails are marked invalid.\n\npossible_trap: \n(do_not_mail) These emails contain keywords that might correlate to possible spam traps like spam@ or @spamtrap.com. Examine these before deciding to send emails to them or not.\n\npossible_typo: \n(invalid) These are emails of commonly misspelled popular domains. These emails are marked invalid.\n\nrole_based: \n(do_not_mail) These emails belong to a position or a group of people, like sales@ info@ and contact@. Role-based emails have a strong correlation to people reporting mails sent to them as spam and abuse.\n\nrole_based_catch_all: \n(do_not_mail) These emails are role-based and also belong to a catch_all domain.\n\ntimeout_exceeded: \n(unknown) These emails belong to a mail server that is responding extremely slow. Most of the time, these emails will end up being invalid.\n\nunroutable_ip_address: (invalid) These emails domains point to an un-routable IP address, these are marked invalid.\n\ndisposable: \n(do_not_mail) These are temporary emails created for the sole purpose to sign up to websites without giving their real email address. These emails are short lived from 15 minutes to around 6 months. There is only 2 values (True and False). If you have valid emails with this flag set to TRUE, you shouldn't email them.\n\ntoxic: \n(do_not_mail) These email addresses are known to be abuse, spam, or bot created emails. If you have valid emails with this flag set to TRUE, you shouldn't email them.\n"
+          example: ""
+          enum:
+          - ""
+          - antispam_system
+          - greylisted
+          - mail_server_temporary_error
+          - forcible_disconnect
+          - mail_server_did_not_respond
+          - timeout_exceeded
+          - failed_smtp_connection
+          - mailbox_quota_exceeded
+          - exception_occurred
+          - possible_trap
+          - role_based
+          - global_suppression
+          - mailbox_not_found
+          - no_dns_entries
+          - failed_syntax_check
+          - possible_typo
+          - unroutable_ip_address
+          - leading_period_removed
+          - does_not_accept_mail
+          - alias_address
+          - role_based_catch_all
+          - disposable
+          - toxic
+        free_email:
+          type: boolean
+          description: True if the email address comes from a free email service provider.
+          example: true
+        domain:
+          type: string
+          description: The portion of the email address after the "@" symbol.
+          example: gmail.com
+        domain_age_days:
+          type: integer
+          description: "Age of the email domain in days or [null]."
+          nullable: true
+          example: 9964
+        smtp_provider:
+          type: string
+          description: "The SMTP Provider of the email or [null]."
+          nullable: true
+          example: google
+        mx_found:
+          type: boolean
+          description: True if the domain have an MX record.
+          example: true
+        mx_record:
+          type: string
+          description: The preferred MX record of the domain
+          example: gmail-smtp-in.l.google.com
+    EmailValidatorListEmailDetails:
+      allOf:
+      - $ref: '#/components/schemas/Email_1'
+      - type: object
+        properties:
+          account_id:
+            type: integer
+            description: Email validator account id.
+            example: 20823223
+          created_at:
+            pattern: "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})"
+            type: string
+            description: The date time the email was inserted into turboSMTP database after being validated.
+            example: 2021-03-17 00:00:00
+          did_you_mean:
+            type: string
+            description: Suggestive Fix for an email typo
+            example: the-user@gmail.com
+          id:
+            type: integer
+            description: Email Id.
+            example: 18535681
+          list_id:
+            type: integer
+            description: List Id.
+            example: 10629
+      - $ref: '#/components/schemas/EmailValidatorMailSharedDetails'
+    EmailValidatorMailDetails:
+      allOf:
+      - $ref: '#/components/schemas/Email_1'
+      - $ref: '#/components/schemas/EmailValidatorMailSharedDetails'
+      - type: object
+        properties:
+          did_you_mean:
+            type: string
+            description: Suggestive Fix for an email typo
+            example: the-user@gmail.com
+          account:
+            type: string
+            description: The portion of the email address before the "@" symbol.
+            example: username
+          firstname:
+            type: string
+            description: "The first name of the owner of the email when available or [null]."
+            nullable: true
+            example: Jhon
+          lastname:
+            type: string
+            description: "The last name of the owner of the email when available or [null]."
+            nullable: true
+            example: Doe
+          gender:
+            type: string
+            description: "The gender of the owner of the email when available or [null]."
+            nullable: true
+            example: female
+          country:
+            type: string
+            description: "The country of the IP passed in or [null]"
+            nullable: true
+            example: null
+          region:
+            type: string
+            description: "The region/state of the IP passed in or [null]"
+            nullable: true
+            example: null
+          city:
+            type: string
+            description: "The city of the IP passed in or [null]"
+            nullable: true
+            example: null
+          zipcode:
+            type: integer
+            description: "The zipcode of the IP passed in or [null]"
+            nullable: true
+            example: null
+          processed_at:
+            pattern: "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})"
+            type: string
+            description: The date time the email was validated.
+            example: 2021-03-17 00:00:00
+    EmailValidatorValidateBadRequestResponseBody:
+      properties:
+        message:
+          type: string
+          enum:
+          - invalid_mail_address
+          - missing_required_parameter_email
+      example:
+        message: invalid_mail_address
+    EmailAddressRequestBody:
+      type: object
+      properties:
+        email:
+          type: string
+          description: email address to validate
+          format: email
+          example: developer@yourcompany.com
+    SubAccountListSucessResponsetBody:
+      type: object
+      properties:
+        count:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubaccountListItem'
+      example:
+        count: 2
+        results:
+        - active: true
+          email: subaccount-1@yourdomain.om
+          subaccount_id: 19302132
+          ip: 199.244.75.250
+          last_used: 2022-11-20 22:44:07
+          limit: 16
+          plan_expiration: 2023-01-17 00:00:00
+          sent: 2
+          plan_limit_interval: Monthly
+        - active: true
+          email: subaccount-2@yourdomain.om
+          subaccount_id: 19302133
+          ip: 199.244.75.250
+          last_used: 2022-11-19 21:04:07
+          limit: 50
+          plan_expiration: 2023-01-17 00:00:00
+          sent: 34
+          plan_limit_interval: Monthly
+    SubaccountListItem:
+      allOf:
+      - $ref: '#/components/schemas/Email_1'
+      - $ref: '#/components/schemas/SubaccountIDStatusBase'
+      - $ref: '#/components/schemas/SubaccountIP'
+      - $ref: '#/components/schemas/SubaccountPlanBase'
+    SubaccountIDStatusBase:
+      allOf:
+      - $ref: '#/components/schemas/SubaccountIP'
+      - $ref: '#/components/schemas/SubaccountActiveStatus'
+      - type: object
+        properties:
+          subaccount_id:
+            type: integer
+            description: Sub account Id
+            example: 19302132
+          parent_id:
+            type: integer
+            description: Sub account parent Id
+            example: 19334162
+    SubaccountIP:
+      type: object
+      properties:
+        ip:
+          type: string
+          description: IP address to use for sending emails.
+          nullable: false
+          example: 185.228.36.19
+    SubaccountActiveStatus:
+      required:
+      - active
+      type: object
+      properties:
+        active:
+          type: boolean
+          description: "Active subaccounts can be used for login purpose, while users can´t login to inactive subaccounts. Notice that in order to be able to send emails the subaccount subscription must also be active. User can set subaccounts to active / inactive from the dashboard."
+          example: true
+    SubaccountPlanBase:
+      allOf:
+      - $ref: '#/components/schemas/SubaccountSMTPLimit'
+      - type: object
+        properties:
+          sent:
+            type: integer
+            description: The ammount of sent emails from the sub account over the current period.
+            example: 125
+          last_used:
+            pattern: "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})"
+            type: string
+            description: The date time the sub account was last used.
+            example: 2021-03-17 00:00:00
+          plan_expiration:
+            pattern: "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})"
+            type: string
+            description: Expiration date time of the plan.
+            nullable: true
+            example: 2023-01-17 00:00:00
+          plan_limit_interval:
+            $ref: '#/components/schemas/SmtpLimitInterval'
+          expired:
+            type: boolean
+            description: Expired if plan expiration date is overdue.
+            nullable: false
+            example: false
+    SubaccountSMTPLimit:
+      required:
+      - limit
+      type: object
+      properties:
+        limit:
+          type: integer
+          description: The ammount of emails the sub account is allowed to send over the period specified by plan_limit_interval. Value -1 means no limit.
+          example: 2000
+    SmtpLimitInterval:
+      type: string
+      description: |
+        Limit interval that specifies if the sub account sending limit is specified daily, monthly or yearly.
+
+        * Important Note: The limit interval allways follows the main account limit.
+      example: Monthly
+      enum:
+      - Daily
+      - Monthly
+      - Yearly
+    CommmonResultResponseBody:
+      type: object
+      properties:
+        result:
+          type: boolean
+          example: true
+    Subaccount:
+      allOf:
+      - $ref: '#/components/schemas/Email_1'
+      - $ref: '#/components/schemas/SubaccountIDStatusBase'
+      - $ref: '#/components/schemas/SubaccountBase'
+    SubaccountBase:
+      allOf:
+      - $ref: '#/components/schemas/SubaccountIP'
+      - type: object
+        properties:
+          first_name:
+            maxLength: 50
+            minLength: 1
+            type: string
+            description: subaccount owner first name
+            nullable: false
+            example: Andrea
+          last_name:
+            maxLength: 50
+            minLength: 1
+            type: string
+            description: subaccount owner last name
+            nullable: false
+            example: Willems
+          address_1:
+            maxLength: 255
+            minLength: 1
+            type: string
+            description: Address Line 1
+            nullable: true
+            example: 51 Guild Street
+          address_2:
+            maxLength: 255
+            minLength: 1
+            type: string
+            description: Address Line 2
+            nullable: true
+            example: 1st Floor
+          city:
+            maxLength: 100
+            minLength: 1
+            type: string
+            description: City
+            nullable: true
+            example: London
+          company_name:
+            maxLength: 100
+            minLength: 1
+            type: string
+            description: Agency Name
+            nullable: true
+            example: Refreshing Soda Inc.
+          country:
+            maxLength: 64
+            minLength: 1
+            type: string
+            description: Country
+            nullable: true
+            example: United Kingdom
+          region:
+            maxLength: 100
+            minLength: 1
+            type: string
+            description: Region
+            nullable: true
+            example: West
+          zip_code:
+            maxLength: 10
+            minLength: 1
+            type: string
+            description: Zip Code
+            nullable: true
+            example: NW10 9NQ
+          phone_number:
+            maxLength: 30
+            minLength: 1
+            type: string
+            description: Phone Number
+            nullable: true
+            example: "5493513164544"
+          policy_agree:
+            type: boolean
+            description: Policy must be agreed in order to be able to create a subaccount.
+            example: true
+          site_url:
+            maxLength: 45
+            minLength: 1
+            type: string
+            description: Website
+            nullable: true
+            example: https://www.refreshing-soda.com
+    SubaccountCreateRequest:
+      allOf:
+      - $ref: '#/components/schemas/Email_1'
+      - $ref: '#/components/schemas/SubaccountBase'
+      - $ref: '#/components/schemas/SubaccountPasswordConfirmPassword'
+      - required:
+        - confirm_password
+        - domain
+        - email
+        - first_name
+        - ip
+        - last_name
+        - password
+        - policy_agree
+        type: object
+    SubaccountPasswordConfirmPassword:
+      type: object
+      properties:
+        password:
+          minLength: 10
+          type: string
+          description: subaccount password
+          nullable: false
+          example: LetmeIn123!
+        confirm_password:
+          minLength: 10
+          type: string
+          description: subaccount confirm password
+          nullable: false
+          example: LetmeIn123!
+    SubaccountUpdateRequest:
+      allOf:
+      - $ref: '#/components/schemas/SubaccountBase'
+      - $ref: '#/components/schemas/SubaccountPasswordConfirmPassword'
+      - required:
+        - domain
+        - first_name
+        - ip
+        - last_name
+        - policy_agree
+        type: object
+    SubaccountActivePlan:
+      allOf:
+      - $ref: '#/components/schemas/SubaccountIDStatusBase'
+      - $ref: '#/components/schemas/SubaccountIP'
+      - $ref: '#/components/schemas/SubaccountPlanBase'
+    Logo:
+      type: object
+      properties:
+        logoUrl:
+          type: string
+    AgencySettings:
+      allOf:
+      - $ref: '#/components/schemas/Logo'
+      - $ref: '#/components/schemas/BaseAgencySettings'
+    BaseAgencySettings:
+      type: object
+      properties:
+        agency_name:
+          maxLength: 128
+          type: string
+          description: Agency Name
+          example: My Agency Inc.
+        agency_website:
+          maxLength: 128
+          type: string
+          description: Agency Website
+          example: https://www.mywebsite.com
+        agency_footer:
+          maxLength: 2048
+          type: string
+          description: Footer to be used
+          example: My signature goes here.
+    AlertListSucessResponsetBody:
+      type: object
+      properties:
+        count:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Alert'
+      example:
+        count: 2
+        results:
+        - id: 4117
+          email: doe-jhon@yourdomain.om
+          percentage: 50
+        - id: 4118
+          email: doe-jhon@yourdomain.om
+          percentage: 100
+    Alert:
+      allOf:
+      - $ref: '#/components/schemas/AlertBase'
+      - type: object
+        properties:
+          id:
+            type: integer
+            description: Alert Id.
+            example: 4117
+    AlertBase:
+      allOf:
+      - $ref: '#/components/schemas/Email_1'
+      - type: object
+        properties:
+          percentage:
+            maximum: 100
+            minimum: 0
+            type: integer
+            description: Percentage of usage that will trigger the alert
+            example: 80
+    AnalyticsListSucessResponsetBody:
+      type: object
+      properties:
+        count:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnalyticMailItem'
+      example:
+        count: 2
+        results:
+        - id: 1800872493473407000
+          subject: Newsletter update
+          sender: sample@gmail.com
+          recipient: robert-doe@elecronic-arts.com
+          send_time: 2023-08-10 04:04:21
+          status: SUCCESS
+          domain: gmail.com
+          error: ""
+          recipient_domain: electronic-arts.com
+        - id: 1800871904471490600
+          subject: New Movies
+          sender: sales@gmail.com
+          recipient: jhon-doe@datamart.com
+          send_time: 2023-08-11 04:04:21
+          status: FAIL
+          domain: gmail.com
+          error: |
+            142.250.138.27 does not like recipient.\nRemote host said: 550-5.1.1 The email account that you tried to reach does not exist. Please try
+            550-5.1.1 double-checking the recipient's email address for typos or
+            550-5.1.1 unnecessary spaces. Learn more at
+            550 5.1.1  https://support.google.com/mail/?p=NoSuchUser s36-20020a05680820a400b003a36545ef49si728995oiw.292 - gsmtp
+            {199.244.74.8}{550} Giving up on 142.250.138.27.
+          recipient_domain: datamart.com
+    AnalyticMailItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Email Id.
+          format: int64
+          example: 1800872493473406976
+        subject:
+          type: string
+          description: Email Subject.
+          example: Business Card.
+        sender:
+          type: string
+          description: Email Sender.
+          format: email.
+          example: user@example.com
+        recipient:
+          type: string
+          description: Email Recipient.
+          format: email.
+          example: user@gmail.com
+        send_time:
+          pattern: "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})"
+          type: string
+          description: Date Time email was sent.
+          example: 2022-11-20 00:00:00
+        status:
+          $ref: '#/components/schemas/AnalyticMailStatus'
+        domain:
+          type: string
+          description: The portion of the sender´s email address after the "@" symbol.
+          example: example.com
+        contact_domain:
+          type: string
+          description: The portion of the recipient´s email address after the "@" symbol.
+          example: gmail.com
+        error:
+          type: string
+          description: Error returned when delivering the email message.
+          example: |
+            142.250.138.27 does not like recipient.\nRemote host said: 550-5.1.1 The email account that you tried to reach does not exist. Please try
+            550-5.1.1 double-checking the recipient's email address for typos or
+            550-5.1.1 unnecessary spaces. Learn more at
+            550 5.1.1  https://support.google.com/mail/?p=NoSuchUser s36-20020a05680820a400b003a36545ef49si728995oiw.292 - gsmtp
+            {199.244.74.8}{550} Giving up on 142.250.138.27.
+      description: Sent Email
+    AnalyticMailStatus:
+      type: string
+      description: |
+        Send Mail Status:
+
+        NEW: email has been queued for delivery
+        DEFER: email is in the queue for delivery
+        SUCCESS: email has been delivered.
+        OPEN: email has been opened.
+        CLICK: email has been clicked.
+        REPORT: email has been reported as spam.
+        FAIL: email has bounced.
+        SYSFAIL: email was dropped.
+        UNSUB: email is unsubscribed.
+
+        Notice that emails that fall into the above statuses can be grouped, ie Turbo-Smtp uses the following groups:
+
+          'Clicks' = 'CLICK',
+          'Unsubscribes' = 'UNSUB',
+          'Spam' = 'REPORT',
+          'Drop' = 'SYSFAIL',
+          'Queued' = 'NEW' or 'DEFER',
+          'Opens'= 'OPEN' or 'CLICK' or 'UNSUB' or 'REPORT',
+          'Delivered'= 'SUCCESS'  or 'OPEN' or 'CLICK' or 'UNSUB' or 'REPORT',
+          'Bounce': 'FAIL'.
+      enum:
+      - NEW
+      - DEFER
+      - SUCCESS
+      - OPEN
+      - CLICK
+      - REPORT
+      - FAIL
+      - SYSFAIL
+      - UNSUB
+    AnalyticFilterBy:
+      type: array
+      properties:
+        length:
+          type: integer
+      description: Filter by
+      example: ""
+      items:
+        $ref: '#/components/schemas/AnalyticFilterByOption'
+    AnalyticFilterByOption:
+      type: string
+      example: domain
+      enum:
+      - subject
+      - sender
+      - recipient
+      - domain
+    AnalyticOrderBy:
+      type: string
+      description: Field to sort by
+      example: send_time
+      default: send_time
+      enum:
+      - send_time
+      - sender
+      - recipient
+      - subject
+    ConsumerKeyListSucessResponsetBody:
+      type: object
+      properties:
+        count:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsumerKey'
+      example:
+        count: 2
+        results:
+        - consumerKey: bff5c9436b6da9fe3c1d3379e7dc0f21
+          label: QA
+          creation_time: 2023-10-12 11:58:11
+        - consumerKey: 1027d089da21adfc7f08dc14303571f3
+          label: Staging
+          creation_time: 2023-08-02 17:18:00
+    ConsumerKey:
+      type: object
+      properties:
+        consumerKey:
+          type: string
+          description: Consumer Key
+          example: b914ad238d0e8e8851b81e86ce46ae1d
+        label:
+          type: string
+          description: Consumer Key label.
+          example: QAkey.
+        creation_time:
+          pattern: "(\\\\d{4}-\\\\d{2}-\\\\d{2} \\\\d{2}:\\\\d{2}:\\\\d{2})"
+          type: string
+          description: The time the consumer key was created.
+          example: 2021-03-17 00:00:00
+    ConsumerKeyCreateResponseBody:
+      type: object
+      properties:
+        consumerKey:
+          type: string
+          description: Consumer Key
+          example: b914ad238d0e8e8851b81e86ce46ae1d
+        consumerSecret:
+          type: string
+          description: Consumer Secret
+          example: JOSenWTYopGjhZ1CDvsEbcK9PNUA06Xy
+    ConsumerKeyCreateRequestBody:
+      type: object
+      properties:
+        label:
+          type: string
+          description: Consumer Key label.
+          example: QAkey.
+  responses:
+    Unauthorized:
+      description: |
+        Unauthorized
+
+        This API requires a valid API Key to be provided.
+        (Use [/authentication/authorize](#/authentication/AuthenticationLogin) to obtain an API Key)
+
+        Produces:
+
+        * missing_authorization_key
+        * invalid_authorization_key
+        * account_is_inactive
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthorizationError'
+          examples:
+            MissingAuthorizationKey:
+              summary: Missing Authorization Key
+              value:
+                message: missing_authorization_key
+            InvalidAuthorizationKey:
+              summary: Invalid / Expired Authorization Key
+              value:
+                message: invalid_authorization_key
+    SuppressionsCSV:
+      description: Suppressions CSV data
+      content:
+        text/csv:
+          schema:
+            type: string
+            example: |
+              Status;Subject;From;To;Date;Reason
+              FAIL;"new email alert";msaad@emailchef.com;a.shatata@emailchef.com;2022-06-28T15:08:37.821Z;"199.187.175.11 does not like recipient.
+              Remote host said: 550 5.1.1 <a.shatata@emailchef.com>: Recipient address rejected: User unknown in virtual mailbox table
+              {199.244.75.250}{550} Giving up on 199.187.175.11.
+              "
+              MANUAL;;;mohamed@test.com;2022-06-18T19:51:04.914Z;
+              FAIL;"Test sending email";msaad@emailchef.com;mshatta@yahoo.com;2021-05-03T12:21:48.000Z;"67.195.204.73 failed after I sent the message. Remote host said: 554 30 Sorry, your message to mshatta@yahoo.com cannot be delivered. This mailbox is disabled (554.30). "
+              FAIL;"Test sending email";msaad@emailchef.com;mohamed_s_shatta@gmail.com;2021-05-03T12:21:04.000Z;"142.250.138.26 does not like recipient. Remote host said: 550-5.1.1 The email account that you tried to reach does not exist. Please try 550-5.1.1 double-checking the recipient's email address for typos or 550-5.1.1 unnecessary spaces. Learn more at 550 5.1.1  https://support.google.com/mail/?p=NoSuchUser g15si5159810otg.85 - gsmtp {199.244.75.250}{550} Giving up on 142.250.138.26. "
+    ValidatedEmailsCSV:
+      description: |
+        Sucess
+
+        Validated Emails by Email Validation List CSV File
+      content:
+        text/csv:
+          schema:
+            type: string
+            example: "Status;Subject;From;To;Date;Reason\nFAIL;\"new email alert\";msaad@emailchef.com;a.shatata@emailchef.com;2022-06-28T15:08:37.821Z;\"199.187.175.11 does not like recipient.\nRemote host said: 550 5.1.1 <a.shatata@emailchef.com>: Recipient address rejected: User unknown in virtual mailbox table\n{199.244.75.250}{550} Giving up on 199.187.175.11.\n\"\nMANUAL;;;mohamed@test.com;2022-06-18T19:51:04.914Z;\nFAIL;\"Test sending email\";msaad@emailchef.com;mshatta@yahoo.com;2021-05-03T12:21:48.000Z;\"67.195.204.73 failed after I sent the message. Remote host said: 554 30 Sorry, your message to mshatta@yahoo.com cannot be delivered. This mailbox is disabled (554.30). \"\nFAIL;\"Test sending email\";msaad@emailchef.com;mohamed_s_shatta@gmail.com;2021-05-03T12:21:04.000Z;\"142.250.138.26 does not like recipient. Remote host said: 550-5.1.1 The email account that you tried to reach does not exist. Please try 550-5.1.1 double-checking the recipient's email address for typos or 550-5.1.1 unnecessary spaces. Learn more at 550 5.1.1  https://support.google.com/mail/?p=NoSuchUser g15si5159810otg.85 - gsmtp {199.244.75.250}{550} Giving up on 142.250.138.26. \"    \n"
+    ForbiddenForActivePlan:
+      description: |
+        Forbidden
+
+        The current active plan does not include this feature, upgrade is required to use this feature.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CommonMessageResponseBody'
+          example:
+            message: feature_not_available_for_active_plan
+    SubaccountNotFound:
+      description: |
+        Not Found
+
+        Please verify the subaccount id is valid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CommonMessageResponseBody'
+          example:
+            message: subaccount_not_found
+    LogoSuccess:
+      description: |
+        Agency Logo Url
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Logo'
+  parameters:
+    PageQueryParam:
+      name: page
+      in: query
+      description: Page number
+      required: false
+      schema:
+        $ref: '#/components/schemas/Page'
+      example: 1
+    LimitQueryParam:
+      name: limit
+      in: query
+      description: The numbers of rows per page to return
+      required: false
+      schema:
+        $ref: '#/components/schemas/PageLimit'
+      example: 10
+    FromQueryParam:
+      name: from
+      in: query
+      description: Start date
+      required: true
+      schema:
+        $ref: '#/components/schemas/FromDate'
+      example: 2020-01-01
+    ToQueryParam:
+      name: to
+      in: query
+      description: End date
+      required: true
+      schema:
+        $ref: '#/components/schemas/ToDate'
+      example: 2025-12-31
+    TimezoneQueryParam:
+      name: tz
+      in: query
+      description: Timezone Offset
+      schema:
+        $ref: '#/components/schemas/Timezone'
+      example: -07:00
+    SuppressionFilterQueryParam:
+      name: filter
+      in: query
+      description: "Text to search (recipient, sender, email subject or reason for suppression)"
+      required: false
+      schema:
+        $ref: '#/components/schemas/SuppressionFilter'
+      examples:
+        byemail:
+          summary: Search for recipient or sender.
+          value: Jhon.Doe@gmail.com
+        bytitle:
+          summary: Search for email title.
+          value: September 2022
+        byreason:
+          summary: Search for imported supressions.
+          value: Imported removal request
+    SuppressionFilterByQueryParam:
+      name: filter_by
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/SuppressionFilterBy'
+    SmartSearchQueryParam:
+      name: smart_search
+      in: query
+      description: Smart search
+      required: false
+      schema:
+        $ref: '#/components/schemas/SmartSearch'
+      example: false
+    SuppressionOrderByQueryParam:
+      name: orderby
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/SuppressionOrderBy'
+    OrderTypeQueryParam:
+      name: ordertype
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/OrderType'
+    IsoCodePathParam:
+      name: isoCode
+      in: path
+      description: Country ISO code
+      required: true
+      schema:
+        type: string
+        example: ES
+    IdParam:
+      name: Id
+      in: path
+      description: Id
+      required: true
+      schema:
+        type: integer
+    SubaccountFilterByEmailQueryParam:
+      name: filterByEmail
+      in: query
+      description: Filter by email addresses that fully/partially match the search value.
+      required: false
+      schema:
+        type: string
+        description: Filter by email addresses that fully/partially match the search value.
+        example: Jhon
+    SubaccountFilterByActiveQueryParam:
+      name: filterByActive
+      in: query
+      description: Filter by subaccount status.
+      required: false
+      schema:
+        type: boolean
+        description: Filter by subaccount status.
+        example: true
+    SubaccountFilterByIPQueryParam:
+      name: "filterByIP[]"
+      in: query
+      description: Filter by IP Addresses.
+      required: false
+      schema:
+        type: array
+        description: Filter by IP Addresses.
+        items:
+          type: string
+    SubaccountOrderByQueryParam:
+      name: orderby
+      in: query
+      description: Field to sort by
+      required: false
+      schema:
+        type: string
+        description: Field to sort by
+        example: email
+        default: email
+        enum:
+        - email
+        - last_used
+    EmailQueryParam:
+      name: Email
+      in: query
+      description: Email address.
+      required: true
+      schema:
+        type: string
+        format: email
+      example: username@gmail.com
+    AnalyticStatusQueryParam:
+      name: "status[]"
+      in: query
+      description: "Filter by Status\n\n    NEW: email has been queued for delivery\n    DEFER: email is in the queue for delivery\n    SUCCESS: email has been delivered.\n    OPEN: email has been opened.\n    CLICK: email has been clicked.\n    REPORT: email has been reported as spam.\n    FAIL: email has bounced.\n    SYSFAIL: email was dropped.\n    UNSUB: email is unsubscribed.\n\n<br />\nNotice that emails that fall into the above statuses can be grouped, ie Turbo-Smtp uses the following groups:\n<br />\n\n    'Clicks' = 'CLICK',\n    'Unsubscribes' = 'UNSUB',\n    'Spam' = 'REPORT',\n    'Drop' = 'SYSFAIL',\n    'Queued' = 'NEW' or 'DEFER',\n    'Opens'= 'OPEN' or 'CLICK' or 'UNSUB' or 'REPORT',\n    'Delivered'= 'SUCCESS'  or 'OPEN' or 'CLICK' or 'UNSUB' or 'REPORT',\n    'Bounce': 'FAIL'.  \n"
+      required: false
+      schema:
+        type: array
+        description: Filter by Status
+        items:
+          $ref: '#/components/schemas/AnalyticMailStatus'
+    AnalyticFilterByQueryParam:
+      name: filter_by
+      in: query
+      description: Filter by
+      required: false
+      schema:
+        $ref: '#/components/schemas/AnalyticFilterBy'
+    AnalyticFilterQueryParam:
+      name: filter
+      in: query
+      description: "Text to search (recipient, sender, email subject or reason for suppression)"
+      required: false
+      schema:
+        $ref: '#/components/schemas/Filter'
+      examples:
+        bysubject:
+          summary: Search for email subject.
+          value: September 2022
+        bysender:
+          summary: Search for emai sender.
+          value: Sales@gmail.com
+        byrecipient:
+          summary: Search for emai recipient.
+          value: Jhon.Doe@gmail.com
+        bydomain:
+          summary: Search for recipient email domain.
+          value: gmail.com
+    AnalyticOrderByQueryParam:
+      name: orderby
+      in: query
+      description: Order by
+      required: false
+      schema:
+        $ref: '#/components/schemas/AnalyticOrderBy'
+    ConsumerKeyPathParam:
+      name: consumerKey
+      in: path
+      description: Consumer Key
+      required: true
+      schema:
+        type: string
+        example: b914ad238d0e8e8851b81e86ce46ae1d
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      name: Authorization
+      in: header
+    consumerKey:
+      type: apiKey
+      name: consumerKey
+      in: header
+    consumerSecret:
+      type: apiKey
+      name: consumerSecret
+      in: header
