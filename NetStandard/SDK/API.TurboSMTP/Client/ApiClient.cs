@@ -362,7 +362,7 @@ namespace API.TurboSMTP.Client
                         // Here, we'll assume JSON APIs are more common. XML can be forced by adding produces/consumes to openapi spec explicitly.
                         request.RequestFormat = DataFormat.Json;
                     }
-                    Console.WriteLine(options.Data);
+
                     request.AddJsonBody(options.Data);
                 }
             }
@@ -541,7 +541,7 @@ namespace API.TurboSMTP.Client
         private async Task<ApiResponse<T>> ExecAsync<T>(RestRequest request, RequestOptions options, IReadableConfiguration configuration, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             var baseUrl = configuration.GetOperationServerUrl(options.Operation, options.OperationIndex) ?? _baseUrl;
-            Console.WriteLine(baseUrl);
+
             var clientOptions = new RestClientOptions(baseUrl)
             {
                 ClientCertificates = configuration.ClientCertificates,
@@ -556,6 +556,7 @@ namespace API.TurboSMTP.Client
                 configureSerialization: serializerConfig => serializerConfig.UseSerializer(() => new CustomJsonCodec(SerializerSettings, configuration))))
             {
                 InterceptRequest(request);
+
                 RestResponse<T> response;
                 if (RetryConfiguration.AsyncRetryPolicy != null)
                 {

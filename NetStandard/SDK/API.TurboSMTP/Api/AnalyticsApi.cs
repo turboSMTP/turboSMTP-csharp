@@ -109,6 +109,29 @@ namespace API.TurboSMTP.Api
         /// <param name="operationIndex">Index associated with the operation.</param>
         /// <returns>ApiResponse of AnalyticsListSucessResponsetBody</returns>
         ApiResponse<AnalyticsListSucessResponsetBody> GetAnalyticsDataWithHttpInfo(DateTime from, DateTime to, int? page = default(int?), int? limit = default(int?), List<AnalyticMailStatus> status = default(List<AnalyticMailStatus>), List<AnalyticFilterByOption> filterBy = default(List<AnalyticFilterByOption>), string filter = default(string), bool? smartSearch = default(bool?), AnalyticOrderBy orderby = default(AnalyticOrderBy), OrderType ordertype = default(OrderType), string tz = default(string), int operationIndex = 0);
+        /// <summary>
+        /// Get Analytics Single Item by ID
+        /// </summary>
+        /// <remarks>
+        /// Get Analytics Data by ID 
+        /// </remarks>
+        /// <exception cref="API.TurboSMTP.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="id">Id</param>
+        /// <param name="operationIndex">Index associated with the operation.</param>
+        /// <returns>AnalyticMailItem</returns>
+        AnalyticMailItem GetAnalyticsDataByID(int id, int operationIndex = 0);
+
+        /// <summary>
+        /// Get Analytics Single Item by ID
+        /// </summary>
+        /// <remarks>
+        /// Get Analytics Data by ID 
+        /// </remarks>
+        /// <exception cref="API.TurboSMTP.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="id">Id</param>
+        /// <param name="operationIndex">Index associated with the operation.</param>
+        /// <returns>ApiResponse of AnalyticMailItem</returns>
+        ApiResponse<AnalyticMailItem> GetAnalyticsDataByIDWithHttpInfo(int id, int operationIndex = 0);
         #endregion Synchronous Operations
     }
 
@@ -204,6 +227,31 @@ namespace API.TurboSMTP.Api
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of ApiResponse (AnalyticsListSucessResponsetBody)</returns>
         System.Threading.Tasks.Task<ApiResponse<AnalyticsListSucessResponsetBody>> GetAnalyticsDataWithHttpInfoAsync(DateTime from, DateTime to, int? page = default(int?), int? limit = default(int?), List<AnalyticMailStatus> status = default(List<AnalyticMailStatus>), List<AnalyticFilterByOption> filterBy = default(List<AnalyticFilterByOption>), string filter = default(string), bool? smartSearch = default(bool?), AnalyticOrderBy orderby = default(AnalyticOrderBy), OrderType ordertype = default(OrderType), string tz = default(string), int operationIndex = 0, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        /// <summary>
+        /// Get Analytics Single Item by ID
+        /// </summary>
+        /// <remarks>
+        /// Get Analytics Data by ID 
+        /// </remarks>
+        /// <exception cref="API.TurboSMTP.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="id">Id</param>
+        /// <param name="operationIndex">Index associated with the operation.</param>
+        /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
+        /// <returns>Task of AnalyticMailItem</returns>
+        System.Threading.Tasks.Task<AnalyticMailItem> GetAnalyticsDataByIDAsync(int id, int operationIndex = 0, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <summary>
+        /// Get Analytics Single Item by ID
+        /// </summary>
+        /// <remarks>
+        /// Get Analytics Data by ID 
+        /// </remarks>
+        /// <exception cref="API.TurboSMTP.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="id">Id</param>
+        /// <param name="operationIndex">Index associated with the operation.</param>
+        /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
+        /// <returns>Task of ApiResponse (AnalyticMailItem)</returns>
+        System.Threading.Tasks.Task<ApiResponse<AnalyticMailItem>> GetAnalyticsDataByIDWithHttpInfoAsync(int id, int operationIndex = 0, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
         #endregion Asynchronous Operations
     }
 
@@ -845,6 +893,168 @@ namespace API.TurboSMTP.Api
             if (this.ExceptionFactory != null)
             {
                 Exception _exception = this.ExceptionFactory("GetAnalyticsData", localVarResponse);
+                if (_exception != null)
+                {
+                    throw _exception;
+                }
+            }
+
+            return localVarResponse;
+        }
+
+        /// <summary>
+        /// Get Analytics Single Item by ID Get Analytics Data by ID 
+        /// </summary>
+        /// <exception cref="API.TurboSMTP.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="id">Id</param>
+        /// <param name="operationIndex">Index associated with the operation.</param>
+        /// <returns>AnalyticMailItem</returns>
+        public AnalyticMailItem GetAnalyticsDataByID(int id, int operationIndex = 0)
+        {
+            API.TurboSMTP.Client.ApiResponse<AnalyticMailItem> localVarResponse = GetAnalyticsDataByIDWithHttpInfo(id);
+            return localVarResponse.Data;
+        }
+
+        /// <summary>
+        /// Get Analytics Single Item by ID Get Analytics Data by ID 
+        /// </summary>
+        /// <exception cref="API.TurboSMTP.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="id">Id</param>
+        /// <param name="operationIndex">Index associated with the operation.</param>
+        /// <returns>ApiResponse of AnalyticMailItem</returns>
+        public API.TurboSMTP.Client.ApiResponse<AnalyticMailItem> GetAnalyticsDataByIDWithHttpInfo(int id, int operationIndex = 0)
+        {
+            API.TurboSMTP.Client.RequestOptions localVarRequestOptions = new API.TurboSMTP.Client.RequestOptions();
+
+            string[] _contentTypes = new string[] {
+            };
+
+            // to determine the Accept header
+            string[] _accepts = new string[] {
+                "application/json"
+            };
+
+            var localVarContentType = API.TurboSMTP.Client.ClientUtils.SelectHeaderContentType(_contentTypes);
+            if (localVarContentType != null)
+            {
+                localVarRequestOptions.HeaderParameters.Add("Content-Type", localVarContentType);
+            }
+
+            var localVarAccept = API.TurboSMTP.Client.ClientUtils.SelectHeaderAccept(_accepts);
+            if (localVarAccept != null)
+            {
+                localVarRequestOptions.HeaderParameters.Add("Accept", localVarAccept);
+            }
+
+            localVarRequestOptions.PathParameters.Add("Id", API.TurboSMTP.Client.ClientUtils.ParameterToString(id)); // path parameter
+
+            localVarRequestOptions.Operation = "AnalyticsApi.GetAnalyticsDataByID";
+            localVarRequestOptions.OperationIndex = operationIndex;
+
+            // authentication (consumerSecret) required
+            if (!string.IsNullOrEmpty(this.Configuration.GetApiKeyWithPrefix("consumerSecret")))
+            {
+                localVarRequestOptions.HeaderParameters.Add("consumerSecret", this.Configuration.GetApiKeyWithPrefix("consumerSecret"));
+            }
+            // authentication (ApiKeyAuth) required
+            if (!string.IsNullOrEmpty(this.Configuration.GetApiKeyWithPrefix("Authorization")))
+            {
+                localVarRequestOptions.HeaderParameters.Add("Authorization", this.Configuration.GetApiKeyWithPrefix("Authorization"));
+            }
+            // authentication (consumerKey) required
+            if (!string.IsNullOrEmpty(this.Configuration.GetApiKeyWithPrefix("consumerKey")))
+            {
+                localVarRequestOptions.HeaderParameters.Add("consumerKey", this.Configuration.GetApiKeyWithPrefix("consumerKey"));
+            }
+
+            // make the HTTP request
+            var localVarResponse = this.Client.Get<AnalyticMailItem>("/analytics/{Id}", localVarRequestOptions, this.Configuration);
+            if (this.ExceptionFactory != null)
+            {
+                Exception _exception = this.ExceptionFactory("GetAnalyticsDataByID", localVarResponse);
+                if (_exception != null)
+                {
+                    throw _exception;
+                }
+            }
+
+            return localVarResponse;
+        }
+
+        /// <summary>
+        /// Get Analytics Single Item by ID Get Analytics Data by ID 
+        /// </summary>
+        /// <exception cref="API.TurboSMTP.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="id">Id</param>
+        /// <param name="operationIndex">Index associated with the operation.</param>
+        /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
+        /// <returns>Task of AnalyticMailItem</returns>
+        public async System.Threading.Tasks.Task<AnalyticMailItem> GetAnalyticsDataByIDAsync(int id, int operationIndex = 0, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            API.TurboSMTP.Client.ApiResponse<AnalyticMailItem> localVarResponse = await GetAnalyticsDataByIDWithHttpInfoAsync(id, operationIndex, cancellationToken).ConfigureAwait(false);
+            return localVarResponse.Data;
+        }
+
+        /// <summary>
+        /// Get Analytics Single Item by ID Get Analytics Data by ID 
+        /// </summary>
+        /// <exception cref="API.TurboSMTP.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="id">Id</param>
+        /// <param name="operationIndex">Index associated with the operation.</param>
+        /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
+        /// <returns>Task of ApiResponse (AnalyticMailItem)</returns>
+        public async System.Threading.Tasks.Task<API.TurboSMTP.Client.ApiResponse<AnalyticMailItem>> GetAnalyticsDataByIDWithHttpInfoAsync(int id, int operationIndex = 0, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+
+            API.TurboSMTP.Client.RequestOptions localVarRequestOptions = new API.TurboSMTP.Client.RequestOptions();
+
+            string[] _contentTypes = new string[] {
+            };
+
+            // to determine the Accept header
+            string[] _accepts = new string[] {
+                "application/json"
+            };
+
+            var localVarContentType = API.TurboSMTP.Client.ClientUtils.SelectHeaderContentType(_contentTypes);
+            if (localVarContentType != null)
+            {
+                localVarRequestOptions.HeaderParameters.Add("Content-Type", localVarContentType);
+            }
+
+            var localVarAccept = API.TurboSMTP.Client.ClientUtils.SelectHeaderAccept(_accepts);
+            if (localVarAccept != null)
+            {
+                localVarRequestOptions.HeaderParameters.Add("Accept", localVarAccept);
+            }
+
+            localVarRequestOptions.PathParameters.Add("Id", API.TurboSMTP.Client.ClientUtils.ParameterToString(id)); // path parameter
+
+            localVarRequestOptions.Operation = "AnalyticsApi.GetAnalyticsDataByID";
+            localVarRequestOptions.OperationIndex = operationIndex;
+
+            // authentication (consumerSecret) required
+            if (!string.IsNullOrEmpty(this.Configuration.GetApiKeyWithPrefix("consumerSecret")))
+            {
+                localVarRequestOptions.HeaderParameters.Add("consumerSecret", this.Configuration.GetApiKeyWithPrefix("consumerSecret"));
+            }
+            // authentication (ApiKeyAuth) required
+            if (!string.IsNullOrEmpty(this.Configuration.GetApiKeyWithPrefix("Authorization")))
+            {
+                localVarRequestOptions.HeaderParameters.Add("Authorization", this.Configuration.GetApiKeyWithPrefix("Authorization"));
+            }
+            // authentication (consumerKey) required
+            if (!string.IsNullOrEmpty(this.Configuration.GetApiKeyWithPrefix("consumerKey")))
+            {
+                localVarRequestOptions.HeaderParameters.Add("consumerKey", this.Configuration.GetApiKeyWithPrefix("consumerKey"));
+            }
+
+            // make the HTTP request
+            var localVarResponse = await this.AsynchronousClient.GetAsync<AnalyticMailItem>("/analytics/{Id}", localVarRequestOptions, this.Configuration, cancellationToken).ConfigureAwait(false);
+
+            if (this.ExceptionFactory != null)
+            {
+                Exception _exception = this.ExceptionFactory("GetAnalyticsDataByID", localVarResponse);
                 if (_exception != null)
                 {
                     throw _exception;
