@@ -1,24 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Web;
 
-namespace TurboSMTPSDK.Model.Email
+namespace TurboSMTP.Domain
 {
-    public sealed class Attachment
+    public sealed class EmailAttachment
     {
-        private Attachment() { }
-        public Attachment(string Base64content, string name, string type)
+        private EmailAttachment() { }
+        public EmailAttachment(string Base64content, string name, string type)
         {
             this.Content = Base64content;
             this.Name = name;
             this.Type = type;
         }
 
-        public Attachment(string filename, string name = default(string))
+        public EmailAttachment(string filename, string name = default(string))
         {
             Content = Convert.ToBase64String(File.ReadAllBytes(filename));
             Name = !String.IsNullOrEmpty(name) ? name : Path.GetFileName(filename);

@@ -1,4 +1,4 @@
-﻿namespace TurboSMTPSDK.Model.Shared
+﻿namespace TurboSMTP.Model.Shared
 {
     public enum OrderType
     {

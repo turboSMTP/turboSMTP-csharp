@@ -1,6 +1,6 @@
-﻿namespace TurboSMTPSDK.Model.Suppressions
+﻿namespace TurboSMTP.Model.Suppressions
 {
-    public enum OrderBy
+    public enum SuppressionsOrderByOption
         {
             Date = 1,
             Source = 2,

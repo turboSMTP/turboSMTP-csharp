@@ -1,6 +1,6 @@
-namespace TurboSMTPSDK.Model.Analytics
+namespace TurboSMTP.Domain
 {
-    public enum MailStatus
+    public enum RelayStatus
     {
         NEW = 1,
         DEFER = 2,

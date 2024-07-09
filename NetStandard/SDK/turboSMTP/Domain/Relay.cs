@@ -1,25 +1,25 @@
 ﻿using System.Text;
 
-namespace TurboSMTPSDK.Model.Analytics
+namespace TurboSMTP.Domain
 {
-    public sealed class Analytic
+    public sealed class Relay
     {
-        private Analytic()
+        private Relay()
         {
                 
         }
-        public Analytic(
-            long id = default(long), 
+        public Relay(
+            long messageID = default(long), 
             string subject = default(string), 
             string sender = default(string), 
             string recipient = default(string), 
             string sendTime = default(string), 
-            MailStatus? status = default(MailStatus?), 
+            RelayStatus? status = default(RelayStatus?), 
             string domain = default(string), 
             string contactDomain = default(string), 
             string error = default(string))
         {
-            this.Id = id;
+            this.MessageID = messageID;
             this.Subject = subject;
             this.Sender = sender;
             this.Recipient = recipient;
@@ -29,8 +29,8 @@ namespace TurboSMTPSDK.Model.Analytics
             this.ContactDomain = contactDomain;
             this.Error = error;
         }
-        public MailStatus? Status { get; set; }
-        public long Id { get; set; }
+        public RelayStatus? Status { get; set; }
+        public long MessageID { get; set; }
         public string Subject { get; set; }
         public string Sender { get; set; }
         public string Recipient { get; set; }
@@ -42,7 +42,7 @@ namespace TurboSMTPSDK.Model.Analytics
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("class Analytic {\n");
-            sb.Append("  Id: ").Append(Id).Append("\n");
+            sb.Append("  MessageID: ").Append(MessageID).Append("\n");
             sb.Append("  Subject: ").Append(Subject).Append("\n");
             sb.Append("  Sender: ").Append(Sender).Append("\n");
             sb.Append("  Recipient: ").Append(Recipient).Append("\n");

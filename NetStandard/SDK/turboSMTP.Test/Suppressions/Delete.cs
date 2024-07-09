@@ -4,34 +4,16 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using turboSMTP.Test;
 using TurboSMTP;
-using TurboSMTPSDK.Model.Suppressions;
+using TurboSMTP.Domain;
+using TurboSMTP.Model.Suppressions;
 
-namespace TurboSMTPSDK.Test.Suppressions
+namespace TurboSMTP.Test.Suppressions
 {
     public class Delete: TestBase
     {
         [SetUp]
         public void Setup()
         {
-        }
-
-        [Test]
-        public async Task Delete_Empty_Email()
-        {
-            //Arrange
-            var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
-            //Act
-            try
-            {
-                var result = await TS.suppressions.Delete(null);
-                //Assert
-                Assert.That(!result);
-            }
-            catch (Exception ex)
-            {
-                Assert.Fail(ex.Message);
-            }
-            Assert.Pass();
         }
 
         [Test]
@@ -42,7 +24,7 @@ namespace TurboSMTPSDK.Test.Suppressions
             //Act
             try
             {
-                var result = await TS.suppressions.DeleteRange(new List<string>());
+                var result = await TS.Suppressions.DeleteRange(new List<string>());
                 //Assert
                 Assert.That(!result);
             }
@@ -62,7 +44,7 @@ namespace TurboSMTPSDK.Test.Suppressions
             //Act
             try
             {
-                var result = await TS.suppressions.Delete(emailToDelete);
+                var result = await TS.Suppressions.Delete(emailToDelete);
                 //Assert
                 Assert.That(result);
             }
@@ -83,8 +65,8 @@ namespace TurboSMTPSDK.Test.Suppressions
             //Act
             try
             {
-                var addResult = await TS.suppressions.Add($"Adding One to Delete - {DateTime.Now.ToString("dd/MM/yy HH:mm:ss")}", emailToDelete);
-                var result = await TS.suppressions.Delete(emailToDelete);
+                var addResult = await TS.Suppressions.Add($"Adding One to Delete - {DateTime.Now.ToString("dd/MM/yy HH:mm:ss")}", emailToDelete);
+                var result = await TS.Suppressions.Delete(emailToDelete);
                 //Assert
                 Assert.That(result);
             }
@@ -104,8 +86,8 @@ namespace TurboSMTPSDK.Test.Suppressions
             //Act
             try
             {
-                var addResult = await TS.suppressions.AddRange($"Adding Multiple to Delete - {DateTime.Now.ToString("dd/MM/yy HH:mm:ss")}", emailsToDelete);
-                var result = await TS.suppressions.DeleteRange(emailsToDelete);
+                var addResult = await TS.Suppressions.AddRange($"Adding Multiple to Delete - {DateTime.Now.ToString("dd/MM/yy HH:mm:ss")}", emailsToDelete);
+                var result = await TS.Suppressions.DeleteRange(emailsToDelete);
                 //Assert
                 Assert.That(result);
             }
@@ -121,15 +103,19 @@ namespace TurboSMTPSDK.Test.Suppressions
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+
+            var deleteOptions = new SuppressionsDeleteOptions.Builder()
+                .SetFrom(DateTime.Now)
+                .SetTo(DateTime.Now)
+                .Build();
+
             //Act
             try
             {
-                var addResult = await TS.suppressions.Add($"Adding To Delete Today Test - {DateTime.Now.ToString("dd/MM/yy HH:mm:ss")}",
+                var addResult = await TS.Suppressions.Add($"Adding To Delete Today Test - {DateTime.Now.ToString("dd/MM/yy HH:mm:ss")}",
                     $"{DateTime.Now.ToString("ddMMyyyyHHmmss")}random@gmail.com"
                     );
-                var result = await TS.suppressions.Delete(
-                    DateTime.Now,
-                    DateTime.Now);
+                var result = await TS.Suppressions.Delete(deleteOptions);
                 Assert.That(result);
             }
             catch (Exception ex)
@@ -144,19 +130,20 @@ namespace TurboSMTPSDK.Test.Suppressions
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
-            var addResult = await TS.suppressions.Add($"Adding To Delete Manual Test - {DateTime.Now.ToString("dd/MM/yy HH:mm:ss")}",
+
+            var deleteOptions = new SuppressionsDeleteOptions.Builder()
+                .SetFrom(DateTime.Now)
+                .SetTo(DateTime.Now)
+                .SetFilter("")
+                .SetFilterBy(new SuppresionSource[] { SuppresionSource.Manual })
+                .Build();
+                
+
+            var addResult = await TS.Suppressions.Add($"Adding To Delete Manual Test - {DateTime.Now.ToString("dd/MM/yy HH:mm:ss")}",
                 $"{DateTime.Now.ToString("ddMMyyyyHHmmss")}random@gmail.com"
                 );
             //Act
-            var result = await TS.suppressions.Delete(
-                DateTime.Now,
-                DateTime.Now,
-                new DeleteOptions()
-                {
-                    filter = "",
-                    filterBy = new List<Source>() { Source.Manual}
-                }
-                );
+            var result = await TS.Suppressions.Delete(deleteOptions);
             //Assert
             Assert.That(result);
             Assert.Pass();
@@ -167,19 +154,19 @@ namespace TurboSMTPSDK.Test.Suppressions
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
-            var addResult = await TS.suppressions.Add($"Adding To Delete Manual Test - {DateTime.Now.ToString("dd/MM/yy HH:mm:ss")}",
+
+            var deleteOptions = new SuppressionsDeleteOptions.Builder()
+                .SetFrom(DateTime.Now)
+                .SetTo(DateTime.Now)
+                .SetFilter("Delete Manual")
+                .SetSmartSearch(true)
+                .Build();
+
+            var addResult = await TS.Suppressions.Add($"Adding To Delete Manual Test - {DateTime.Now.ToString("dd/MM/yy HH:mm:ss")}",
                 $"{DateTime.Now.ToString("ddMMyyyyHHmmss")}random@gmail.com"
                 );
             //Act
-            var result = await TS.suppressions.Delete(
-                DateTime.Now,
-                DateTime.Now,
-                new DeleteOptions()
-                {
-                    filter = "Delete Manual",
-                    smartSearch = true
-                }
-                );
+            var result = await TS.Suppressions.Delete(deleteOptions);
             //Assert
             Assert.That(result);
             Assert.Pass();
@@ -190,26 +177,31 @@ namespace TurboSMTPSDK.Test.Suppressions
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+
             var ReasonContainsKeyword = "Subject Contains";
-            var addResult = await TS.suppressions.Add($"Adding To Delete By Subject Contains - {DateTime.Now.ToString("dd/MM/yy HH:mm:ss")}",
+
+            var restriction = new SuppressionsRestriction[]
+                {
+                    new SuppressionsRestriction()
+                    {
+                        By = SuppresionsRestrictionFilterBy.Reason,
+                        Filter = ReasonContainsKeyword,
+                        SmartSearch = true,
+                        Operator = SuppressionsRestrictionOperator.Include
+                    }
+                };
+
+            var deleteOptions = new SuppressionsDeleteOptions.Builder()
+                .SetFrom(DateTime.Now)
+                .SetTo(DateTime.Now)
+                .SetRestrictions(restriction)
+                .Build();
+            
+            var addResult = await TS.Suppressions.Add($"Adding To Delete By Subject Contains - {DateTime.Now.ToString("dd/MM/yy HH:mm:ss")}",
                 $"{DateTime.Now.ToString("ddMMyyyyHHmmss")}random@gmail.com"
                 );
             //Act
-            var result = await TS.suppressions.Delete(
-                DateTime.Now,
-                DateTime.Now,
-                null,
-                new List<AdvancedFilter>()
-                {
-                    new AdvancedFilter()
-                    {
-                        By = AdvancedFilterBy.Reason,
-                        Filter = ReasonContainsKeyword,
-                        SmartSearch = true,
-                        Operator = AdvancedFilterOperator.Include
-                    }
-                }
-                );
+            var result = await TS.Suppressions.Delete(deleteOptions);
             //Assert
             Assert.That(result);
             Assert.Pass();

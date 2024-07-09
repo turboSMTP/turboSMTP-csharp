@@ -7,11 +7,11 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using TurboSMTPSDK.Model.EmailValidator;
-using TurboSMTPSDK.Model.Shared;
-using File = TurboSMTPSDK.Model.EmailValidator.File;
+using TurboSMTP.Model.EmailValidator;
+using TurboSMTP.Model.Shared;
+using File = TurboSMTP.Model.EmailValidator.File;
 
-namespace TurboSMTPSDK.Services
+namespace TurboSMTP.Services
 {
     public sealed class EmailValidator
     {
@@ -21,7 +21,6 @@ namespace TurboSMTPSDK.Services
         {
             
         }
-        private readonly TurboSMTPClient turboSMTP;
 
         public EmailValidator(Configuration configuration)
         {

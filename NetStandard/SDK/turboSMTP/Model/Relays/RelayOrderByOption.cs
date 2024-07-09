@@ -1,6 +1,6 @@
-namespace TurboSMTPSDK.Model.Analytics
+namespace TurboSMTP.Model.Relays
 {
-    public enum OrderBy
+    public enum RelayOrderByOption
     {
         SendTime = 1,
         Sender = 2,

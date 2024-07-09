@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 
-namespace TurboSMTPSDK.Model.Shared
+namespace TurboSMTP.Model.Shared
 {
     public sealed class PagedListResults<T>
     {

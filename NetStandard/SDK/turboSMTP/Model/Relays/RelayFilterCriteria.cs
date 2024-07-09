@@ -1,6 +1,6 @@
-namespace TurboSMTPSDK.Model.Analytics
+namespace TurboSMTP.Model.Relays
 {
-    public enum FilterCriteria
+    public enum RelayFilterCriteria
     {
         Subject = 1,
         Sender = 2,

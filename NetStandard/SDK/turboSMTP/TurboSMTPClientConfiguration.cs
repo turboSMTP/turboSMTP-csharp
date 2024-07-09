@@ -68,7 +68,7 @@ namespace TurboSMTP
         public string ConsumerSecret { get; private set; }
         public string ServerURL { get; private set; }
         public string SendServerURL { get; private set; }
-        public string TimeZone { get; private set; }
+        public string TimeZone { get; private set; } = default(string);
 
         // Private constructor to prevent direct instantiation
         private TurboSMTPClientConfiguration() { }

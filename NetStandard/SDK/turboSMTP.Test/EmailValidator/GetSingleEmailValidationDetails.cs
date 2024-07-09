@@ -6,9 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using turboSMTP.Test;
 using TurboSMTP;
-using TurboSMTPSDK.Model.Shared;
+using TurboSMTP.Model.Shared;
 
-namespace TurboSMTPSDK.Test.EmailValidator
+namespace TurboSMTP.Test.EmailValidator
 {
     public class GetSingleEmailValidationDetails: TestBase
     {

@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 
-namespace TurboSMTPSDK.Model.Suppressions
+namespace TurboSMTP.Model.Suppressions
 {
-    public sealed class AddResult
+    public sealed class SuppressionsAddResult
     {
-        private AddResult() { }
-        public AddResult(string status = default(string), List<string> valid = default(List<string>), List<string> invalid = default(List<string>))
+        private SuppressionsAddResult() { }
+        public SuppressionsAddResult(string status = default(string), List<string> valid = default(List<string>), List<string> invalid = default(List<string>))
         {
             this.Status = status;
             this.Valid = valid;

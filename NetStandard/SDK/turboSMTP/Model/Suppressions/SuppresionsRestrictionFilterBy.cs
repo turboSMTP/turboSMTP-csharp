@@ -1,6 +1,6 @@
-﻿namespace TurboSMTPSDK.Model.Suppressions
+﻿namespace TurboSMTP.Model.Suppressions
 {
-    public enum AdvancedFilterBy
+    public enum SuppresionsRestrictionFilterBy
     {
         Sender = 1,
         Recipient = 2,

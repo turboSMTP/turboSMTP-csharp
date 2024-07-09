@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace TurboSMTPSDK.Model.Extensions
+namespace TurboSMTP.Model.Extensions
 {
     public static class StringExtensions
     {

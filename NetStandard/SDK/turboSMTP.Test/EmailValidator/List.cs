@@ -3,9 +3,9 @@ using System;
 using System.Threading.Tasks;
 using turboSMTP.Test;
 using TurboSMTP;
-using TurboSMTPSDK.Model.EmailValidator;
+using TurboSMTP.Model.EmailValidator;
 
-namespace TurboSMTPSDK.Test.EmailValidator
+namespace TurboSMTP.Test.EmailValidator
 {
     public class List: TestBase
     {

@@ -1,22 +1,19 @@
 ﻿using System.Configuration;
 using TurboSMTP;
-using TurboSMTPSDK.Services;
+using TurboSMTP.Services;
 using API.TurboSMTP.Client;
 using Configuration = API.TurboSMTP.Client.Configuration;
 using API.TurboSMTP.Model;
 using System.Collections.Generic;
 
-namespace TurboSMTPSDK
+namespace TurboSMTP
 {
     public class TurboSMTPClient
     {
-        private readonly string ConsumerKey;
-        private readonly string ConsumerSecret;
-
-        public readonly Suppressions suppressions;
-        public readonly Emails emails;
+        public readonly Suppressions Suppressions;
+        public readonly EmailMessages Emails;
         public readonly EmailValidator emailValidator;
-        public readonly Analytics analytics;
+        public readonly Relays Relays;
 
         public TurboSMTPClient(TurboSMTPClientConfiguration configuration)
         {
@@ -54,10 +51,10 @@ namespace TurboSMTPSDK
 
             GlobalConfiguration.Instance = APIConfiguration;
 
-            this.analytics = new Analytics(APIConfiguration);
-            this.emails = new Emails(APIConfiguration);
+            this.Relays = new Relays(APIConfiguration,configuration.TimeZone);
+            this.Emails = new EmailMessages(APIConfiguration);
             this.emailValidator = new EmailValidator(APIConfiguration);
-            this.suppressions = new Suppressions(APIConfiguration);
+            this.Suppressions = new Suppressions(APIConfiguration,configuration.TimeZone);
         }
     }
 }

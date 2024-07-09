@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using turboSMTP.Test;
 using TurboSMTP;
 
-namespace TurboSMTPSDK.Test.Suppressions
+namespace TurboSMTP.Test.Suppressions
 {
     public class Add: TestBase
     {
@@ -26,7 +26,7 @@ namespace TurboSMTPSDK.Test.Suppressions
             //Act
             try
             {
-                var result = await TS.suppressions.AddRange(
+                var result = await TS.Suppressions.AddRange(
                     $"Adding Multiple - {DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")}",
                     new List<string>()
                     {
@@ -62,7 +62,7 @@ namespace TurboSMTPSDK.Test.Suppressions
             //Act
             try
             {
-                var result = await TS.suppressions.Add(
+                var result = await TS.Suppressions.Add(
                     $"Adding Single - {DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")}",
                     AddressToAdd
                     );
@@ -86,7 +86,7 @@ namespace TurboSMTPSDK.Test.Suppressions
             //Act
             try
             {
-                var result = await TS.suppressions.Add(
+                var result = await TS.Suppressions.Add(
                     $"Adding Invalid - {DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")}",
                     "valid1@gmail"
                     );

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Text;
-using TurboSMTPSDK.Model.Extensions;
+using TurboSMTP.Model.Extensions;
 
-namespace TurboSMTPSDK.Model.Suppressions
+namespace TurboSMTP.Domain
 {
     public sealed class Suppression
     {
         private Suppression() { }
-        public Suppression(string date = default(string), string sender = default(string), Source? source = default(Source?), string subject = default(string), string recipient = default(string), string reason = default(string))
+        public Suppression(string date = default(string), string sender = default(string), SuppresionSource? source = default(SuppresionSource?), string subject = default(string), string recipient = default(string), string reason = default(string))
         {
             this.Date = date.FromTSDatetimes();
             this.Sender = sender;
@@ -16,7 +16,7 @@ namespace TurboSMTPSDK.Model.Suppressions
             this.Recipient = recipient;
             this.Reason = reason;
         }
-        public Source? Source { get; set; }
+        public SuppresionSource? Source { get; set; }
         public DateTime Date { get; set; }
         public string Sender { get; set; }
         public string Subject { get; set; }

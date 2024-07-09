@@ -1,12 +1,10 @@
 ﻿using NUnit.Framework;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using turboSMTP.Test;
-using TurboSMTP;
-using TurboSMTPSDK.Model.Analytics;
+using TurboSMTP.Model.Relays;
 
-namespace TurboSMTPSDK.Test.Analytics
+namespace TurboSMTP.Test.Relays
 {
     public class Export: TestBase
     {
@@ -15,16 +13,18 @@ namespace TurboSMTPSDK.Test.Analytics
         {
         }
         [Test]
-        public async Task Export_Analytics_With_Default_Params()
+        public async Task Export_Relays_With_Default_Params()
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+            var queryOptions = new RelaysExportOptions.Builder()
+                .SetFrom(DateTime.Now.AddYears(-3))
+                .SetTo(DateTime.Now)
+                .Build();
             //Act
             try
             {
-                var result = await TS.analytics.Export(
-                    DateTime.Now.AddYears(-3),
-                    DateTime.Now);
+                var result = await TS.Relays.Export(queryOptions);
                 //Assert
                 Assert.That(result.Length>0);
             }
@@ -36,25 +36,22 @@ namespace TurboSMTPSDK.Test.Analytics
         }
 
         [Test]
-        public async Task Export_Analytics_Filtered_By_Subject()
+        public async Task Export_Relays_Filtered_By_Subject()
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
-            var keyWord = "test";
+            var queryOptions = new RelaysExportOptions.Builder()
+                .SetFrom(DateTime.Now.AddYears(-3))
+                .SetTo(DateTime.Now)
+                .SetFilterBy(new[] { RelayFilterCriteria.Subject })
+                .SetFilter("test")
+                .Build();
+
             //Act
-            var result = await TS.analytics.Export(
-                DateTime.Now.AddYears(-3),
-                DateTime.Now,
-                new ListOptions()
-                {
-                    limit = 1000,
-                    filterBy = new[] { FilterCriteria.Subject }.ToList(),
-                    filter = keyWord
-                }
-                );
+            var result = await TS.Relays.Export(queryOptions);
             //Assert
             Assert.That(result.Length > 0);
-            Assert.That(result.Contains(keyWord));
+            Assert.That(result.Contains(queryOptions.Filter));
             Assert.Pass();
         }
     }

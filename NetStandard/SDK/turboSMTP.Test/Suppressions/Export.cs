@@ -5,9 +5,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using turboSMTP.Test;
 using TurboSMTP;
-using TurboSMTPSDK.Model.Suppressions;
+using TurboSMTP.Model.Suppressions;
 
-namespace TurboSMTPSDK.Test.Suppressions
+namespace TurboSMTP.Test.Suppressions
 {
     public class Export: TestBase
     {
@@ -20,12 +20,16 @@ namespace TurboSMTPSDK.Test.Suppressions
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+
+            var exportOptions = new SuppressionsExportOptions.Builder()
+                .SetFrom(DateTime.Now.AddYears(-3))
+                .SetTo(DateTime.Now)
+                .Build();
+
             //Act
             try
             {
-                var result = await TS.suppressions.Export(
-                    DateTime.Now.AddYears(-3),
-                    DateTime.Now);
+                var result = await TS.Suppressions.Export(exportOptions);
                 //Assert
                 Assert.That(result.Length>0);
             }
@@ -41,23 +45,28 @@ namespace TurboSMTPSDK.Test.Suppressions
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+
             var SubjectContainsKeyword = "test";
-            //Act
-            var result = await TS.suppressions.Export(
-                DateTime.Now.AddYears(-3),
-                DateTime.Now,
-                new ExportOptions(),
-                new List<AdvancedFilter>()
+
+            var restrictions = new SuppressionsRestriction[]
+            {
+                new SuppressionsRestriction()
                 {
-                    new AdvancedFilter()
-                    {
-                        By = AdvancedFilterBy.Subject,
+                        By = SuppresionsRestrictionFilterBy.Subject,
                         Filter = SubjectContainsKeyword,
                         SmartSearch = true,
-                        Operator = AdvancedFilterOperator.Include
-                    }
+                        Operator = SuppressionsRestrictionOperator.Include
                 }
-                );
+            };
+
+            var exportOptions = new SuppressionsExportOptions.Builder()
+                .SetFrom(DateTime.Now.AddYears(-3))
+                .SetTo(DateTime.Now)
+                .SetRestrictions(restrictions)
+                .Build();
+
+            //Act
+            var result = await TS.Suppressions.Export(exportOptions);
             //Assert
             Assert.That(result.Length > 0);
             Assert.That(result.Contains(SubjectContainsKeyword));

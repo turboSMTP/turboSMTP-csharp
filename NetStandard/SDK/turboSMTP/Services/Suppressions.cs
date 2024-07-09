@@ -5,71 +5,66 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TurboSMTPSDK.Model.Shared;
-using TurboSMTPSDK.Model.Suppressions;
-using Suppression = TurboSMTPSDK.Model.Suppressions.Suppression;
+using TurboSMTP.Domain;
+using TurboSMTP.Model.Shared;
+using TurboSMTP.Model.Suppressions;
+using Suppression = TurboSMTP.Domain.Suppression;
 
-namespace TurboSMTPSDK.Services
+
+namespace TurboSMTP.Services
 {
     public sealed class Suppressions
     {
         ISuppressionsApiAsync API;
+        String TimeZone = "00:00";
         private Suppressions()
         {
             
         }
-        private readonly TurboSMTPClient turboSMTP;
 
-        public Suppressions(Configuration configuration)
+        public Suppressions(Configuration configuration, string timeZone)
         {
             API = new SuppressionsApi(configuration);
+            this.TimeZone = timeZone;
         }
+
+        public async Task<SuppressionsAddResult> AddRange(String reason, List<string> emailAddresses)
+        {
+            var result = await API.ImportSuppressionsAsync(new SuppressionImportJson(SuppressionImportJson.TypeEnum.Manual, reason, emailAddresses));
+
+            return new SuppressionsAddResult(
+                result.Status,
+                result.Valid,
+                result.Invalid
+                );
+        }
+        public async Task<SuppressionsAddResult> Add(string reason, string emailAddress)
+        {
+            return await AddRange(reason, new List<string> { emailAddress });
+        }
+
 
         private PagedListResults<Suppression> GetPagedListResults(SuppressionsSucessResponsetBody response)
         {
             return new PagedListResults<Suppression>()
             {
                 TotalRecords = response.Count,
-                Records = response.Results.Select(r => new Suppression(r.Date, r.Sender, (Source)r.Source, r.Subject, r.Recipient, r.Reason)).ToList()
+                Records = response.Results.Select(r => new Suppression(r.Date, r.Sender, (SuppresionSource)r.Source, r.Subject, r.Recipient, r.Reason)).ToList()
             };
         }
 
-        public async Task<PagedListResults<Suppression>> List(DateTime from, DateTime to)
+        public async Task<PagedListResults<Suppression>> Query(SuppressionsQueryOptions options)
         {
-            return await List(from, to, new ListOptions());
-        }
-
-        public async Task<PagedListResults<Suppression>> List(DateTime from, DateTime to, ListOptions options)
-        {
-
-            var response = await API.GetSuppressionsAsync(
-                from,
-                to,
-                options.page,
-                options.limit,
-                options.tz,
-                options.filter,
-                options.filterBy!=null ? options.filterBy.Select(f => (SuppressionSource)f).ToList() : null,
-                options.smartSearch,
-                (SuppressionOrderBy)options.orderby,
-                (API.TurboSMTP.Model.OrderType)options.ordertype,
-                0);
-
-            return GetPagedListResults(response);
-        }
-
-        public async Task<PagedListResults<Suppression>> List(DateTime from, DateTime to, ListOptions options, List<AdvancedFilter> restrictions)
-        {
-            var suppressionFilterOrderPageRequestBody = new SuppressionFilterOrderPageRequestBody(from, to) {
-                Page = options.page,
-                Limit = options.limit,
-                Tz = options.tz,
-                Filter = options.filter,
-                FilterBy = options.filterBy != null ? options.filterBy.Select(f => (SuppressionSource)f).ToList() : null,
-                SmartSearch = options.smartSearch,
-                Orderby = (SuppressionOrderBy)options.orderby,
-                Ordertype = (API.TurboSMTP.Model.OrderType)options.ordertype,
-                Restrict = restrictions.Select(r => new SuppressionRestriction(
+            var suppressionFilterOrderPageRequestBody = new SuppressionFilterOrderPageRequestBody(options.From, options.To) {
+                Page = options.Page,
+                Limit = options.Limit,
+                Tz = TimeZone,
+                Filter = options.Filter,
+                FilterBy = options.FilterBy != null ? options.FilterBy.Select(f => (SuppressionSource)f).ToList() : null,
+                SmartSearch = options.SmartSearch,
+                Orderby = (SuppressionOrderBy)options.OrderBy,
+                Ordertype = (API.TurboSMTP.Model.OrderType)options.OrderType,
+                Restrict = options.Restrictions.Select(r => new SuppressionRestriction(
                     (SuppressionRestrictBy)r.By,
                     (SuppressionOperator)r.Operator,
                     r.Filter,
@@ -80,36 +75,15 @@ namespace TurboSMTPSDK.Services
             return GetPagedListResults(response);
         }
 
-        public async Task<string> Export(DateTime from, DateTime to)
+        public async Task<string> Export(SuppressionsExportOptions options)
         {
-            return await Export(from, to, new ExportOptions());
-        }
-
-        public async Task<string> Export(DateTime from, DateTime to, ExportOptions options)
-        {
-            var response = await API.ExportSuppressionsDataCSVAsync(
-                from,
-                to,
-                options.tz,
-                options.filter,
-                options.filterBy != null ? options.filterBy.Select(f => (SuppressionSource)f).ToList() : null,
-                options.smartSearch,
-                (SuppressionOrderBy)options.orderby,
-                (API.TurboSMTP.Model.OrderType)options.ordertype,
-                0);
-
-            return response;
-        }
-
-        public async Task<string> Export(DateTime from, DateTime to, ExportOptions options, List<AdvancedFilter> restrictions)
-        {
-            var response = await API.ExportFilterSuppressionsAsync(new SuppressionFilterRequestBody(from, to)
+            var response = await API.ExportFilterSuppressionsAsync(new SuppressionFilterRequestBody(options.From, options.To)
             {
-                Tz = options.tz,
-                Filter = options.filter,
-                FilterBy = options.filterBy != null ? options.filterBy.Select(f => (SuppressionSource)f).ToList() : null,
-                SmartSearch = options.smartSearch,
-                Restrict = restrictions.Select(r => new SuppressionRestriction(
+                Tz = TimeZone,
+                Filter = options.Filter,
+                FilterBy = options.FilterBy != null ? options.FilterBy.Select(f => (SuppressionSource)f).ToList() : null,
+                SmartSearch = options.SmartSearch,
+                Restrict = options.Restrictions.Select(r => new SuppressionRestriction(
                     (SuppressionRestrictBy)r.By,
                     (SuppressionOperator)r.Operator,
                     r.Filter,
@@ -120,20 +94,7 @@ namespace TurboSMTPSDK.Services
             return response;
         }
 
-        public async Task<AddResult> AddRange(String reason, List<string> emailAddresses)
-        {
-            var result = await API.ImportSuppressionsAsync(new SuppressionImportJson(SuppressionImportJson.TypeEnum.Manual, reason, emailAddresses));
 
-            return new AddResult(
-                result.Status,
-                result.Valid,
-                result.Invalid
-                );
-        }
-        public async Task<AddResult> Add(string reason, string emailAddress)
-        {
-            return await AddRange(reason, new List<string> {emailAddress });
-        }
         public async Task<bool> DeleteRange(List<string> emails)
         {
             if (emails == null || emails.Count == 0)
@@ -147,16 +108,15 @@ namespace TurboSMTPSDK.Services
                 return false;
             return await DeleteRange(new List<string>() { email });
         }
-
-        public async Task<bool> Delete(DateTime from, DateTime to, DeleteOptions options, List<AdvancedFilter> restrictions)
+        public async Task<bool> Delete(SuppressionsDeleteOptions options)
         {
-            var suppressionFilterRequestBody = new SuppressionFilterRequestBody(from, to)
+            var suppressionFilterRequestBody = new SuppressionFilterRequestBody(options.From, options.To)
             {
-                Tz = options?.tz,
-                Filter = options?.filter,
-                FilterBy = options?.filterBy != null ? options?.filterBy.Select(f => (SuppressionSource)f).ToList() : null,
-                SmartSearch = options?.smartSearch,
-                Restrict = restrictions?.Select(r => new SuppressionRestriction(
+                Tz = TimeZone,
+                Filter = options.Filter,
+                FilterBy = options.FilterBy != null ? options.FilterBy.Select(f => (SuppressionSource)f).ToList() : null,
+                SmartSearch = options.SmartSearch,
+                Restrict = options.Restrictions?.Select(r => new SuppressionRestriction(
                     (SuppressionRestrictBy)r.By,
                     (SuppressionOperator)r.Operator,
                     r.Filter,
@@ -166,17 +126,5 @@ namespace TurboSMTPSDK.Services
             var response = await API.DeleteFilterSuppressionsAsync(suppressionFilterRequestBody);
             return response.Success;
         }
-
-        public async Task<bool> Delete(DateTime from, DateTime to, DeleteOptions options)
-        {
-            return await Delete(from, to, options, null);
-        }
-
-
-        public async Task<bool> Delete(DateTime from, DateTime to)
-        {
-            return await Delete(from, to, null);
-        }
-
     }
 }

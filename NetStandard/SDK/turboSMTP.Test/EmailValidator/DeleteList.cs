@@ -6,9 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using turboSMTP.Test;
 using TurboSMTP;
-using TurboSMTPSDK.Test.Suppressions;
+using TurboSMTP.Test.Suppressions;
 
-namespace TurboSMTPSDK.Test.EmailValidator
+namespace TurboSMTP.Test.EmailValidator
 {
     public class DeleteList: TestBase
     {

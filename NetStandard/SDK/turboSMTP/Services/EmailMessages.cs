@@ -1,28 +1,29 @@
 ﻿using API.TurboSMTP.Api;
 using API.TurboSMTP.Client;
 using API.TurboSMTP.Model;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
-using TurboSMTPSDK.Model.Extensions;
-using Email = TurboSMTPSDK.Model.Email.Email;
+using TurboSMTP.Domain;
+using TurboSMTP.Model.Extensions;
 
-namespace TurboSMTPSDK.Services
+namespace TurboSMTP.Services
 {
-    public sealed class Emails
+    public sealed class EmailMessages
     {
         IMailApiAsync API;
 
-        private Emails()
+        private EmailMessages()
         {
             
         }
 
-        public Emails(Configuration configuration)
+        public EmailMessages(Configuration configuration)
         {
             API = new MailApi(configuration);
         }
 
-        public async Task<SendSucessResponsetBody> Send(Email email)
+        public async Task<SendSucessResponsetBody> Send(EmailMessage email)
         {
             var emailRequest = new EmailRequestBody()
             {

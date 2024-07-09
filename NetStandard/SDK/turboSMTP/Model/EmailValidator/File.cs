@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Text;
-using TurboSMTPSDK.Model.Extensions;
+using TurboSMTP.Model.Extensions;
 
-namespace TurboSMTPSDK.Model.EmailValidator
+namespace TurboSMTP.Model.EmailValidator
 {
     public sealed class File
     {

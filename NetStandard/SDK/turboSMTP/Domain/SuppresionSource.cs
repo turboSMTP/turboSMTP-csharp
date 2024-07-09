@@ -1,6 +1,6 @@
-﻿namespace TurboSMTPSDK.Model.Suppressions
+﻿namespace TurboSMTP.Domain
 {
-    public enum Source
+    public enum SuppresionSource
     {
         Manual = 1,
         Bounce = 2,

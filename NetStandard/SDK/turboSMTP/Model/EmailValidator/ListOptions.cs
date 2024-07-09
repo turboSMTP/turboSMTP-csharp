@@ -1,6 +1,6 @@
-﻿using TurboSMTPSDK.Model.Shared;
+﻿using TurboSMTP.Model.Shared;
 
-namespace TurboSMTPSDK.Model.EmailValidator
+namespace TurboSMTP.Model.EmailValidator
 {
     public sealed class ListOptions : PageListOptions
     {

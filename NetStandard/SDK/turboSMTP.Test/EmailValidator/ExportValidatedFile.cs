@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using turboSMTP.Test;
 using TurboSMTP;
 
-namespace TurboSMTPSDK.Test.EmailValidator
+namespace TurboSMTP.Test.EmailValidator
 {
     public class ExportValidatedFile: TestBase
     {

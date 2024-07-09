@@ -1,7 +1,7 @@
 using System;
 using System.Text;
 
-namespace TurboSMTPSDK.Model.EmailValidator
+namespace TurboSMTP.Model.EmailValidator
 {
     public class EmailAddressDetails
     {

@@ -1,12 +1,12 @@
 ﻿using System.Linq;
 using System.Text;
 
-namespace TurboSMTPSDK.Model.Suppressions
+namespace TurboSMTP.Model.Suppressions
 {
-    public sealed class AdvancedFilter
+    public sealed class SuppressionsRestriction
     {
-        private AdvancedFilter() { }
-        public AdvancedFilter(AdvancedFilterBy? by = default(AdvancedFilterBy?), AdvancedFilterOperator? varOperator = default(AdvancedFilterOperator?), string filter = default(string), bool? smartSearch = false)
+        private SuppressionsRestriction() { }
+        public SuppressionsRestriction(SuppresionsRestrictionFilterBy? by = default(SuppresionsRestrictionFilterBy?), SuppressionsRestrictionOperator? varOperator = default(SuppressionsRestrictionOperator?), string filter = default(string), bool? smartSearch = false)
         {
             this.By = by;
             this.Operator = varOperator;
@@ -14,8 +14,8 @@ namespace TurboSMTPSDK.Model.Suppressions
             // use default value if no "smartSearch" provided
             this.SmartSearch = smartSearch ?? false;
         }
-        public AdvancedFilterBy? By { get; set; }
-        public AdvancedFilterOperator? Operator { get; set; }
+        public SuppresionsRestrictionFilterBy? By { get; set; }
+        public SuppressionsRestrictionOperator? Operator { get; set; }
 
         public string Filter { get; set; }
         public bool? SmartSearch { get; set; }

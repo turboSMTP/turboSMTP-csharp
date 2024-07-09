@@ -2,15 +2,15 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Mail;
 using turboSMTP.Test;
-using TurboSMTP;
-using TurboSMTPSDK.Model.Email;
-using Email = TurboSMTPSDK.Model.Email.Email;
+using TurboSMTP.Domain;
 
-namespace TurboSMTPSDK.Test.Emails
+namespace TurboSMTP.Test.Emails
 {
     public class Send: TestBase
     {
@@ -24,17 +24,16 @@ namespace TurboSMTPSDK.Test.Emails
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
-            var email = new Email()
-            {
-                From = "msaad@emailchef.com",
-                To = new List<string>() { "sergio.a.matteoda@gmail.com" },
-                Subject= "Une seule pièce ensemble from c#",
-                Content = "This is the first in a row"
-            };
+            var emailMessage = new EmailMessage.Builder()
+                .SetFrom(AppConstants.EmailSender)
+                .AddTo(AppConstants.ValidEmailAddresses.First())
+                .SetSubject("Trivia contest simple email")
+                .SetHtmlContent("Do not loose the opportunity to participate.")
+                .Build();
             //Act
             try
             {
-                var result = await TS.emails.Send(email);
+                var result = await TS.Emails.Send(emailMessage);
                 //Assert
                 Assert.That(result.Message == "OK");
                 Assert.That(result.Mid > 0);
@@ -51,34 +50,29 @@ namespace TurboSMTPSDK.Test.Emails
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
-            var email = new Email()
-            {
-                From = "msaad@emailchef.com",
-                To = new List<string>() { "sergio.a.matteoda@gmail.com" },
-                Subject = $"Full-Email {DateTime.Now.ToString("dd/MM/YYYY HH:mm:ss")}",
-                Content = "This is the first in a row",
-                HtmlContent = "This is <b>html</b> content<br/><br/>",
-                CustomHeaders = new Dictionary<string, string>
-                {
-                    { "List-Unsubscribe", "<https://www.example.com/unlist?id=8822772727>" },
-                    { "X-Entity-Ref-ID", "4ec7b020-51dc-442f-bd39-9b0a32c3eb83" },
-                    { "Tracking-Id", "888884433" },
-                    { "reply-to", "alternative-email@domain.com" }
-                },
-                ReferenceId = $"SystemRef{new Random().Next()}",
-                Attachments = new List<Attachment>()
-                {
-                    new Attachment(
+
+            var emailAttachment = new EmailAttachment(
                         Convert.ToBase64String(Encoding.UTF8.GetBytes("This is a sample text within a file")),
                         "SampleDocument.txt",
-                        "text/plain"
-                    )
-                }
-            };
+                        "text/plain");
+
+            var emailMessage = new EmailMessage.Builder()
+                .SetFrom(AppConstants.EmailSender)
+                .AddTo(AppConstants.ValidEmailAddresses.First())
+                .SetSubject($"Full-Email {DateTime.Now.ToString("dd/MM/YYYY HH:mm:ss")}")
+                .SetHtmlContent("This is <b>html</b> content<br/><br/>")
+                .AddCustomHeader("List-Unsubscribe", "<https://www.example.com/unlist?id=8822772727>")
+                .AddCustomHeader("X-Entity-Ref-ID", "4ec7b020-51dc-442f-bd39-9b0a32c3eb83")
+                .AddCustomHeader("Tracking-Id", "888884433")
+                .AddCustomHeader("reply-to", "alternative-email@domain.com")
+                .SetReferenceId($"SystemRef{new Random().Next()}")
+                .AddAttachment(emailAttachment)
+                .Build();
+
             //Act
             try
             {
-                var result = await TS.emails.Send(email);
+                var result = await TS.Emails.Send(emailMessage);
                 //Assert
                 Assert.That(result.Message == "OK");
                 Assert.That(result.Mid > 0);
@@ -95,37 +89,34 @@ namespace TurboSMTPSDK.Test.Emails
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
-            var email = new Email()
-            {
-                From = "msaad@emailchef.com",
-                To = new List<string>() { "sergio.a.matteoda@gmail.com" },
-                Subject = $"Full-Email-Files-Attached {DateTime.Now.ToString("dd/MM/YYYY HH:mm:ss")}",
-                Content = "This is the first in a row",
-                HtmlContent = "This is <b>html</b> content<br/><br/>",
-                CustomHeaders = new Dictionary<string, string>
-                {
-                    { "List-Unsubscribe", "<https://www.example.com/unlist?id=8822772727>" },
-                    { "X-Entity-Ref-ID", "4ec7b020-51dc-442f-bd39-9b0a32c3eb83" },
-                    { "Tracking-Id", "888884433" },
-                    { "reply-to", "alternative-email@domain.com" }
-                },
-                ReferenceId = $"SystemRef{new Random().Next()}",
-                Attachments = new List<Attachment>()
-                {
-                    new Attachment(
+
+            var emailAttachment_1 = new EmailAttachment(
                         Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                        "Emails/SampleFiles/sample.png")
-                    ),
-                    new Attachment(
+                        "Emails/SampleFiles/sample.png"));
+
+            var emailAttachment_2 = new EmailAttachment(
                         Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                        "Emails/SampleFiles/dummy.pdf"),"renamed.pdf"
-                    )
-                }
-            };
+                        "Emails/SampleFiles/dummy.pdf"), "renamed.pdf");
+
+            var emailMessage = new EmailMessage.Builder()
+                .SetFrom(AppConstants.EmailSender)
+                .AddTo(AppConstants.ValidEmailAddresses.First())
+                .SetSubject($"Full-Email-Files-Attached {DateTime.Now.ToString("dd/MM/YYYY HH:mm:ss")}")
+                .SetContent("This is the text version")
+                .SetHtmlContent("This is <b>html</b> content<br/><br/>")
+                .AddCustomHeader("List-Unsubscribe", "<https://www.example.com/unlist?id=8822772727>")
+                .AddCustomHeader("X-Entity-Ref-ID", "4ec7b020-51dc-442f-bd39-9b0a32c3eb83")
+                .AddCustomHeader("Tracking-Id", "888884433")
+                .AddCustomHeader("reply-to", "alternative-email@domain.com")
+                .SetReferenceId($"SystemRef{new Random().Next()}")
+                .AddAttachment(emailAttachment_1)
+                .AddAttachment(emailAttachment_2)
+                .Build();
+
             //Act
             try
             {
-                var result = await TS.emails.Send(email);
+                var result = await TS.Emails.Send(emailMessage);
                 //Assert
                 Assert.That(result.Message == "OK");
                 Assert.That(result.Mid > 0);
