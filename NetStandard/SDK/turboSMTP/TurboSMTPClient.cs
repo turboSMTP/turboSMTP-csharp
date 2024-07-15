@@ -13,6 +13,8 @@ namespace TurboSMTP
         public readonly Suppressions Suppressions;
         public readonly EmailMessages Emails;
         public readonly EmailValidator emailValidator;
+        public readonly EmailValidatorFiles EmailValidatorFiles;
+        public readonly EmailValidatorFileResults EmailValidatorFileResults;
         public readonly Relays Relays;
 
         public TurboSMTPClient(TurboSMTPClientConfiguration configuration)
@@ -53,8 +55,10 @@ namespace TurboSMTP
 
             this.Relays = new Relays(APIConfiguration,configuration.TimeZone);
             this.Emails = new EmailMessages(APIConfiguration);
-            this.emailValidator = new EmailValidator(APIConfiguration);
+            this.emailValidator = new EmailValidator(APIConfiguration, configuration.TimeZone);
             this.Suppressions = new Suppressions(APIConfiguration,configuration.TimeZone);
+            this.EmailValidatorFiles = new EmailValidatorFiles(APIConfiguration, configuration.TimeZone);
+            this.EmailValidatorFileResults = new EmailValidatorFileResults(APIConfiguration, configuration.TimeZone);
         }
     }
 }

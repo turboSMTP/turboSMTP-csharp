@@ -24,7 +24,7 @@ namespace TurboSMTP.Test.EmailValidator
             //Act
             try
             {
-                var result = await TS.emailValidator.Validate(5);
+                var result = await TS.EmailValidatorFiles.Validate(5);
                 //Assert
                 Assert.That(!result);
             }
@@ -43,13 +43,13 @@ namespace TurboSMTP.Test.EmailValidator
             //Act
             try
             {
-                var listId = await TS.emailValidator.AddFile($"{DateTime.Now.ToString("ddMMyyyyHHmmss")}emailvalidatorlistValidateTest.txt", new List<string>
+                var listId = await TS.EmailValidatorFiles.Add($"{DateTime.Now.ToString("ddMMyyyyHHmmss")}emailvalidatorlistValidateTest.txt", new List<string>
                 {
                     "sergio.b.c@gmail.com",
                     "sergio.c.c@gmail.com"
                 });
                 Assert.That(listId > 0);
-                var result = await TS.emailValidator.Validate(listId);
+                var result = await TS.EmailValidatorFiles.Validate(listId);
                 //Assert
                 Assert.That(result);
             }

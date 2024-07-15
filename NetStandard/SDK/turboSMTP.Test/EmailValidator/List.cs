@@ -19,12 +19,17 @@ namespace TurboSMTP.Test.EmailValidator
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+
+
+            var emailValidatorFilesQueryOptions = new EmailValidatorFilesQueryOptions.Builder()
+                .SetFrom(DateTime.Now.AddYears(-3))
+                .SetTo(DateTime.Now)
+                .Build();
+
             //Act
             try
             {
-                var result = await TS.emailValidator.List(
-                    DateTime.Now.AddYears(-3),
-                    DateTime.Now);
+                var result = await TS.EmailValidatorFiles.Query(emailValidatorFilesQueryOptions);
                 //Assert
                 Assert.That(result.Records.Count <= 10);
             }
@@ -40,17 +45,17 @@ namespace TurboSMTP.Test.EmailValidator
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
-            var limit = 5;
+
+            var emailValidatorFilesQueryOptions = new EmailValidatorFilesQueryOptions.Builder()
+                .SetFrom(DateTime.Now.AddYears(-3))
+                .SetTo(DateTime.Now)
+                .SetLimit(5)
+                .Build();
+
             //Act
-            var result = await TS.emailValidator.List(
-                DateTime.Now.AddYears(-3),
-                DateTime.Now,
-                new ListOptions()
-                {
-                    limit = limit
-                });
+            var result = await TS.EmailValidatorFiles.Query(emailValidatorFilesQueryOptions);
             //Assert
-            Assert.That(result.Records.Count <= limit, $"Limit = {limit} - Returned results = {result.TotalRecords}");
+            Assert.That(result.Records.Count <= emailValidatorFilesQueryOptions.Limit, $"Limit = {emailValidatorFilesQueryOptions.Limit} - Returned results = {result.TotalRecords}");
             Assert.Pass();
         }
     }

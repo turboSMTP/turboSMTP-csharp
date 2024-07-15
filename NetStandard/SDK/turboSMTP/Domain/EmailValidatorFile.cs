@@ -2,12 +2,12 @@
 using System.Text;
 using TurboSMTP.Model.Extensions;
 
-namespace TurboSMTP.Model.EmailValidator
+namespace TurboSMTP.Domain
 {
-    public sealed class File
+    public sealed class EmailValidatorFile
     {
-        private File() { }
-        public File(int id = default(int), string creationTime = default(string), string fileName = default(string), bool isProcessed = default(bool), int percentage = default(int), int totalEmails = default(int), int totalProcessed = default(int))
+        private EmailValidatorFile() { }
+        public EmailValidatorFile(int id = default(int), string creationTime = default(string), string fileName = default(string), bool isProcessed = default(bool), int percentage = default(int), int totalEmails = default(int), int totalProcessed = default(int))
         {
             this.Id = id;
             this.CreationTime = creationTime.FromTSDatetimes();

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using turboSMTP.Test;
 using TurboSMTP;
+using TurboSMTP.Model.EmailValidator;
 
 namespace TurboSMTP.Test.EmailValidator
 {
@@ -22,19 +23,24 @@ namespace TurboSMTP.Test.EmailValidator
             //Act
             try
             {
-                var listId = await TS.emailValidator.AddFile($"{DateTime.Now.ToString("ddMMyyyyHHmmss")}emailvalidatorlist.txt", new List<string>
+                var listId = await TS.EmailValidatorFiles.Add($"{DateTime.Now.ToString("ddMMyyyyHHmmss")}emailvalidatorlist.txt", new List<string>
                 {
                     "sergio.b.c@gmail.com",
                     "sergio.c.c@gmail.com"
                 });
+
+                var options = new EmailValidatorFileResultsQueryOptions.Builder()
+                    .SetFileId(listId)
+                    .Build();
+
                 //Assert
                 Assert.That(listId > 0, "Generated Test List should be greater than zero");
-                var result = await TS.emailValidator.GetEmailValidationDetailsByList(listId);
+                var result = await TS.EmailValidatorFileResults.GetEmailValidationDetailsByList(options);
                 //Assert
                 Assert.That(result != null, "List Details results should not be null");
                 Assert.That(result.Records.Count == 0, "List Details should not have processed emails until validated");
-                await TS.emailValidator.Validate(listId);
-                var stringResult = await TS.emailValidator.Export(listId);
+                await TS.EmailValidatorFiles.Validate(listId);
+                var stringResult = await TS.EmailValidatorFileResults.Export(listId);
                 Assert.That(!String.IsNullOrEmpty(stringResult), "List Details result should not be null after validation");
                 Assert.That(stringResult.Contains("sergiobc@gmail.com"), "After validating a list it should contain the address added to validate");
             }

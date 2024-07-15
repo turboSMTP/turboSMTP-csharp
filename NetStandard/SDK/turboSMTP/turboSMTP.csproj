@@ -43,16 +43,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\EmailValidator\EmailValidatorFileResultsQueryOptions.cs" />
     <Compile Include="Model\Relays\RelaysExportOptions.cs" />
     <Compile Include="Model\Relays\RelaysQueryOptions.cs" />
     <Compile Include="Model\Relays\RelaysBaseOptions.cs" />
-    <Compile Include="Model\EmailValidator\EmailAddressDetails.cs" />
+    <Compile Include="Model\EmailValidator\EmailAddressValidationDetails.cs" />
     <Compile Include="Model\Shared\IDateRange.cs" />
     <Compile Include="Model\Shared\IPagingOptions.cs" />
     <Compile Include="Model\Suppressions\SuppressionsDeleteOptions.cs" />
     <Compile Include="Model\Suppressions\SuppressionsExportOptions.cs" />
     <Compile Include="Model\Suppressions\SuppressionsQueryOptions.cs" />
     <Compile Include="Model\Suppressions\SuppressionsBaseOptions.cs" />
+    <Compile Include="Services\EmailValidatorBase.cs" />
+    <Compile Include="Services\EmailValidatorFileResults.cs" />
+    <Compile Include="Services\EmailValidatorFiles.cs" />
     <Compile Include="Services\Relays.cs" />
     <Compile Include="Services\EmailMessages.cs" />
     <Compile Include="Services\EmailValidator.cs" />
@@ -60,15 +64,14 @@
     <Compile Include="Model\Relays\RelayOrderByOption.cs" />
     <Compile Include="Model\Relays\RelayFilterCriteria.cs" />
     <Compile Include="Domain\RelayStatus.cs" />
-    <Compile Include="Model\EmailValidator\File.cs" />
-    <Compile Include="Model\EmailValidator\ListOptions.cs" />
-    <Compile Include="Model\EmailValidator\Subscription.cs" />
+    <Compile Include="Domain\EmailValidatorFile.cs" />
+    <Compile Include="Model\EmailValidator\EmailValidatorFilesQueryOptions.cs" />
+    <Compile Include="Domain\EmailValidatorSubscription.cs" />
     <Compile Include="Domain\EmailMessage.cs" />
     <Compile Include="Domain\EmailAttachment.cs" />
     <Compile Include="Model\Extensions\StringExtensions.cs" />
     <Compile Include="Model\Shared\OrderType.cs" />
     <Compile Include="Model\Shared\PagedListResults.cs" />
-    <Compile Include="Model\Shared\PageListOptions.cs" />
     <Compile Include="Domain\Suppression.cs" />
     <Compile Include="Model\Suppressions\SuppressionsAddResult.cs" />
     <Compile Include="Model\Suppressions\SuppressionsOrderByOption.cs" />

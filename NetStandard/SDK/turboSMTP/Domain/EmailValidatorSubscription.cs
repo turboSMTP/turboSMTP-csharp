@@ -3,12 +3,12 @@ using System;
 using System.Text;
 using TurboSMTP.Model.Extensions;
 
-namespace TurboSMTP.Model.EmailValidator
+namespace TurboSMTP.Domain
 {
-    public sealed class Subscription
+    public sealed class EmailValidatorSubscription
     {
-        private Subscription() { }
-        public Subscription(Currency currency = default(Currency), int freeCredits = default(int), int freeCreditsUsed = default(int), string lastUsedPeriod = default(string), string latestPeriodStartDate = default(string), string periodExpirationDate = default(string), decimal paidCredits = default(decimal), int remainingFreeCredit = default(int))
+        private EmailValidatorSubscription() { }
+        public EmailValidatorSubscription(Currency currency = default(Currency), int freeCredits = default(int), int freeCreditsUsed = default(int), string lastUsedPeriod = default(string), string latestPeriodStartDate = default(string), string periodExpirationDate = default(string), decimal paidCredits = default(decimal), int remainingFreeCredit = default(int))
         {
             this.Currency = currency;
             this.FreeCredits = freeCredits;

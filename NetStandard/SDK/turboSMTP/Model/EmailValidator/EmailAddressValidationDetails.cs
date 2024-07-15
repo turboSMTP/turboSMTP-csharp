@@ -3,9 +3,9 @@ using System.Text;
 
 namespace TurboSMTP.Model.EmailValidator
 {
-    public class EmailAddressDetails
+    public class EmailAddressValidationDetails
     {
-        public enum StatusEnum
+        public enum EmailAddressValidationStatus
         {
             Valid = 1,
             Invalid = 2,
@@ -16,8 +16,8 @@ namespace TurboSMTP.Model.EmailValidator
             DoNotMail = 7
         }
 
-        public StatusEnum? Status { get; set; }
-        public enum SubStatusEnum
+        public EmailAddressValidationStatus? Status { get; set; }
+        public enum EmailAddressValidationSubStatus
         {
             Empty = 1,
             AntispamSystem = 2,
@@ -45,8 +45,8 @@ namespace TurboSMTP.Model.EmailValidator
             Toxic = 24
         }
 
-        public SubStatusEnum? SubStatus { get; set; }
-        protected EmailAddressDetails() { }
+        public EmailAddressValidationSubStatus? SubStatus { get; set; }
+        protected EmailAddressValidationDetails() { }
         /// <summary>
         /// Initializes a new instance of the <see cref="EmailValidatorMailDetailsBasic" /> class.
         /// </summary>
@@ -60,7 +60,7 @@ namespace TurboSMTP.Model.EmailValidator
         /// <param name="mxFound">True if the domain have an MX record..</param>
         /// <param name="mxRecord">The preferred MX record of the domain.</param>
         /// <param name="id">the id of the email address.</param>
-        public EmailAddressDetails(string email = default(string), StatusEnum? status = default(StatusEnum?), SubStatusEnum? subStatus = default(SubStatusEnum?), bool freeEmail = default(bool), string domain = default(string), int? domainAgeDays = default(int?), string smtpProvider = default(string), bool mxFound = default(bool), string mxRecord = default(string), int id = default(int))
+        public EmailAddressValidationDetails(string email = default(string), EmailAddressValidationStatus? status = default(EmailAddressValidationStatus?), EmailAddressValidationSubStatus? subStatus = default(EmailAddressValidationSubStatus?), bool freeEmail = default(bool), string domain = default(string), int? domainAgeDays = default(int?), string smtpProvider = default(string), bool mxFound = default(bool), string mxRecord = default(string), int id = default(int))
         {
             // to ensure "email" is required (not null)
             if (email == null)

@@ -26,7 +26,7 @@ namespace TurboSMTP.Test.EmailValidator
             {
                 var result = await TS.emailValidator.Validate("support@gmail.com");
                 //Assert
-                Assert.That(result);
+                Assert.That(result.Email.ToLower()== "support@gmail.com");
             }
             catch (SuccessException) { }
             catch (Exception ex)
@@ -45,7 +45,7 @@ namespace TurboSMTP.Test.EmailValidator
             {
                 var result = await TS.emailValidator.Validate("support@gggmail.cm");
                 //Assert
-                Assert.That(result);
+                Assert.That(result == null);
             }
             catch (SuccessException) { }
             catch (Exception ex)
