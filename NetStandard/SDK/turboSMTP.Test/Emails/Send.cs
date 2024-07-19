@@ -1,12 +1,10 @@
 ﻿using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web.Mail;
 using turboSMTP.Test;
 using TurboSMTP.Domain;
 
@@ -14,22 +12,19 @@ namespace TurboSMTP.Test.Emails
 {
     public class Send: TestBase
     {
-        [SetUp]
-        public void Setup()
-        {
-        }
-
         [Test]
         public async Task Send_Simple_Email()
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+
             var emailMessage = new EmailMessage.Builder()
                 .SetFrom(AppConstants.EmailSender)
                 .AddTo(AppConstants.ValidEmailAddresses.First())
                 .SetSubject("Trivia contest simple email")
                 .SetHtmlContent("Do not loose the opportunity to participate.")
                 .Build();
+
             //Act
             try
             {
@@ -58,8 +53,9 @@ namespace TurboSMTP.Test.Emails
 
             var emailMessage = new EmailMessage.Builder()
                 .SetFrom(AppConstants.EmailSender)
-                .AddTo(AppConstants.ValidEmailAddresses.First())
-                .SetSubject($"Full-Email {DateTime.Now.ToString("dd/MM/YYYY HH:mm:ss")}")
+                .AddTo(AppConstants.ValidEmailAddresses[0])
+                .AddTo(AppConstants.ValidEmailAddresses[1])
+                .SetSubject($"Full-Email - {GetFormatedDateTime()}")
                 .SetHtmlContent("This is <b>html</b> content<br/><br/>")
                 .AddCustomHeader("List-Unsubscribe", "<https://www.example.com/unlist?id=8822772727>")
                 .AddCustomHeader("X-Entity-Ref-ID", "4ec7b020-51dc-442f-bd39-9b0a32c3eb83")
@@ -101,7 +97,7 @@ namespace TurboSMTP.Test.Emails
             var emailMessage = new EmailMessage.Builder()
                 .SetFrom(AppConstants.EmailSender)
                 .AddTo(AppConstants.ValidEmailAddresses.First())
-                .SetSubject($"Full-Email-Files-Attached {DateTime.Now.ToString("dd/MM/YYYY HH:mm:ss")}")
+                .SetSubject($"Full-Email-Files-Attached - {{GetFormatedDateTime()")
                 .SetContent("This is the text version")
                 .SetHtmlContent("This is <b>html</b> content<br/><br/>")
                 .AddCustomHeader("List-Unsubscribe", "<https://www.example.com/unlist?id=8822772727>")

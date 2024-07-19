@@ -1,9 +1,5 @@
 ﻿using NUnit.Framework;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TurboSMTP;
 
 namespace turboSMTP.Test
@@ -28,6 +24,16 @@ namespace turboSMTP.Test
         public void GlobalTeardown()
         {
 
+        }
+
+        public string GetFormatedDateTime()
+        {
+            return DateTime.Now.ToString("dd/MM/YYYY HH:mm:ss");
+        }
+
+        public string GetFormatedDateTimeCompressed()
+        {
+            return DateTime.Now.ToString("ddMMYYYYHHmmss");
         }
     }
 }

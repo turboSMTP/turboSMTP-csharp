@@ -1,49 +1,24 @@
 ﻿using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using turboSMTP.Test;
 using TurboSMTP;
 
-namespace TurboSMTP.Test.EmailValidator
+namespace turboSMTP.Test.EmailValidator.EmailValidatorFiles
 {
-    public class ValidateEmail: TestBase
+    public class Get : TestBase
     {
-        [SetUp]
-        public void Setup()
-        {
-        }
-
         [Test]
-        public async Task Validate_ValidEmail()
+        public async Task Get_By_ID_Invalid()
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+            
             //Act
             try
             {
-                var result = await TS.emailValidator.Validate("support@gmail.com");
-                //Assert
-                Assert.That(result.Email.ToLower()== "support@gmail.com");
-            }
-            catch (SuccessException) { }
-            catch (Exception ex)
-            {
-                Assert.Fail(ex.Message);
-            }
-        }
-
-        [Test]
-        public async Task Validate_InlidEmail()
-        {
-            //Arrange
-            var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
-            //Act
-            try
-            {
-                var result = await TS.emailValidator.Validate("support@gggmail.cm");
+                var result = await TS.EmailValidatorFiles.Get(0);
+                
                 //Assert
                 Assert.That(result == null);
             }
@@ -54,5 +29,30 @@ namespace TurboSMTP.Test.EmailValidator
             }
         }
 
+        [Test]
+        public async Task Get_By_ID_Valid()
+        {
+            //Arrange
+            var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+            
+            //Act
+            try
+            {
+                var fileId = await TS.EmailValidatorFiles.Add(
+                    $"{GetFormatedDateTimeCompressed()}-EmailvalidatorFile.txt",
+                    AppConstants.ValidEmailAddresses.GetRange(0, 2));
+
+                Assert.That(fileId > 0);
+                var result = await TS.EmailValidatorFiles.Get(fileId);
+                //Assert
+                Assert.That(result != null);
+                Assert.That(result.TotalEmails, Is.EqualTo(2));
+            }
+            catch (SuccessException) { }
+            catch (Exception ex)
+            {
+                Assert.Fail(ex.Message);
+            }
+        }
     }
 }

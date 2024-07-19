@@ -1,31 +1,23 @@
 ﻿using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using turboSMTP.Test;
 using TurboSMTP;
-using TurboSMTP.Test.Suppressions;
 
-namespace TurboSMTP.Test.EmailValidator
+namespace turboSMTP.Test.EmailValidator.EmailValidatorFiles
 {
-    public class DeleteList: TestBase
+    public class Delete : TestBase
     {
-        [SetUp]
-        public void Setup()
-        {
-        }
-
         [Test]
-        public async Task Delete_List_By_ID_Invalid()
+        public async Task Delete_By_ID_Invalid()
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+
             //Act
             try
             {
-                var result = await TS.EmailValidatorFiles.Delete(5);
+                var result = await TS.EmailValidatorFiles.Delete(0);
                 //Assert
                 Assert.That(!result);
             }
@@ -37,20 +29,20 @@ namespace TurboSMTP.Test.EmailValidator
         }
 
         [Test]
-        public async Task Delete_List_By_ID_Valid()
+        public async Task Delete_By_ID_Valid()
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+            int fileId = 0;
             //Act
             try
             {
-                var listId = await TS.EmailValidatorFiles.Add($"{DateTime.Now.ToString("ddMMyyyyHHmmss")}emailvalidatorlist.txt", new List<string>
-                {
-                    "sergio.b.c@gmail.com",
-                    "sergio.c.c@gmail.com"
-                });
-                Assert.That(listId > 0);
-                var result = await TS.EmailValidatorFiles.Delete(listId);
+                fileId = await TS.EmailValidatorFiles.Add(
+                     $"{GetFormatedDateTimeCompressed()}-EmailvalidatorFile.txt",
+                     AppConstants.InvalidEmailAddresses.GetRange(0, 2));
+
+                Assert.That(fileId > 0);
+                var result = await TS.EmailValidatorFiles.Delete(fileId);
                 //Assert
                 Assert.That(result);
             }

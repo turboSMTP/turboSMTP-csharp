@@ -1,20 +1,13 @@
 ﻿using NUnit.Framework;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using turboSMTP.Test;
-using TurboSMTP;
 using TurboSMTP.Model.Suppressions;
 
 namespace TurboSMTP.Test.Suppressions
 {
     public class Export: TestBase
     {
-        [SetUp]
-        public void Setup()
-        {
-        }
         [Test]
         public async Task Export_Suppressions_With_Default_Params()
         {
@@ -30,6 +23,7 @@ namespace TurboSMTP.Test.Suppressions
             try
             {
                 var result = await TS.Suppressions.Export(exportOptions);
+                
                 //Assert
                 Assert.That(result.Length>0);
             }
@@ -46,14 +40,12 @@ namespace TurboSMTP.Test.Suppressions
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
 
-            var SubjectContainsKeyword = "test";
-
             var restrictions = new SuppressionsRestriction[]
             {
                 new SuppressionsRestriction()
                 {
                         By = SuppresionsRestrictionFilterBy.Subject,
-                        Filter = SubjectContainsKeyword,
+                        Filter = "test",
                         SmartSearch = true,
                         Operator = SuppressionsRestrictionOperator.Include
                 }
@@ -69,7 +61,7 @@ namespace TurboSMTP.Test.Suppressions
             var result = await TS.Suppressions.Export(exportOptions);
             //Assert
             Assert.That(result.Length > 0);
-            Assert.That(result.Contains(SubjectContainsKeyword));
+            Assert.That(result.Contains(restrictions[0].Filter));
             Assert.Pass();
         }
     }

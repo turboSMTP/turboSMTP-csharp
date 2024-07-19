@@ -1,50 +1,40 @@
 ﻿using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using turboSMTP.Test;
-using TurboSMTP;
 
 namespace TurboSMTP.Test.Suppressions
 {
     public class Add: TestBase
     {
-        [SetUp]
-        public void Setup()
-        {
-        }
         [Test]
-        public async Task Add_3_Valid_2_Invalid()
+        public async Task Add_3_Valid_2_Malformed()
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
-            var AddressToAdd1 = $"{DateTime.Now.ToString("ddMMyyyyHHmmss")}test1.multiple@gmail.com";
-            var AddressToAdd2 = $"{DateTime.Now.ToString("ddMMyyyyHHmmss")}test2.multiple@gmail.com";
-            var AddressToAdd3 = $"{DateTime.Now.ToString("ddMMyyyyHHmmss")}test3.multiple@gmail.com";
+
+            var emailAddressesToAdd = new List<string>()
+            {
+                $"{GetFormatedDateTimeCompressed()}test1.multiple@gmail.com",
+                $"{GetFormatedDateTimeCompressed()}test2.multiple@gmail.com",
+                $"{GetFormatedDateTimeCompressed()}test3.multiple@gmail.com",
+                "testinginvalid",
+                "testinginvalid@gmail@hotmail@google.com"
+            };
+            
             //Act
             try
             {
-                var result = await TS.Suppressions.AddRange(
-                    $"Adding Multiple - {DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")}",
-                    new List<string>()
-                    {
-                        AddressToAdd1,
-                        AddressToAdd2,
-                        AddressToAdd3,
-                        "testinginvalid",
-                        "testinginvalid@gmail@hotmail@google.com"
-                    }
-                    );
+                var result = await TS.Suppressions.AddRange("Adding Multiple - {GetFormatedDateTime()}",emailAddressesToAdd);
                 //Assert
                 Assert.That(result.Valid.Count == 3);
                 Assert.That(result.Invalid.Count == 2);
-                Assert.That(result.Valid.Contains(AddressToAdd1));
-                Assert.That(result.Valid.Contains(AddressToAdd2));
-                Assert.That(result.Valid.Contains(AddressToAdd3));
-                Assert.That(result.Invalid.Contains("testinginvalid"));
-                Assert.That(result.Invalid.Contains("testinginvalid@gmail@hotmail@google.com"));
+                Assert.That(result.Valid.Contains(emailAddressesToAdd[0]));
+                Assert.That(result.Valid.Contains(emailAddressesToAdd[1]));
+                Assert.That(result.Valid.Contains(emailAddressesToAdd[2]));
+                Assert.That(result.Invalid.Contains(emailAddressesToAdd[3]));
+                Assert.That(result.Invalid.Contains(emailAddressesToAdd[4]));
             }
             catch (Exception ex)
             {
@@ -58,18 +48,16 @@ namespace TurboSMTP.Test.Suppressions
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
-            var AddressToAdd = $"{DateTime.Now.ToString("ddMMyyyyHHmmss")}valid1.single@gmail.com";
+            var emailAddressToAdd = $"{GetFormatedDateTimeCompressed()}valid1.single@gmail.com";
             //Act
             try
             {
-                var result = await TS.Suppressions.Add(
-                    $"Adding Single - {DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")}",
-                    AddressToAdd
-                    );
+                var result = await TS.Suppressions.Add($"Adding Single - {GetFormatedDateTime()}", emailAddressToAdd);
+                
                 //Assert
                 Assert.That(result.Valid.Count == 1);
                 Assert.That(result.Invalid.Count == 0);
-                Assert.That(result.Valid.Contains(AddressToAdd));
+                Assert.That(result.Valid.Contains(emailAddressToAdd));
             }
             catch (Exception ex)
             {
@@ -83,17 +71,18 @@ namespace TurboSMTP.Test.Suppressions
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+
+            var emailAddressToAdd = $"{GetFormatedDateTimeCompressed()}invalidvalid.single@gmail";
+
             //Act
             try
             {
-                var result = await TS.Suppressions.Add(
-                    $"Adding Invalid - {DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")}",
-                    "valid1@gmail"
-                    );
+                var result = await TS.Suppressions.Add($"Adding Invalid - {GetFormatedDateTime()}", emailAddressToAdd);
+                
                 //Assert
                 Assert.That(result.Valid.Count == 0);
                 Assert.That(result.Invalid.Count == 1);
-                Assert.That(result.Invalid.Contains("valid1@gmail"));
+                Assert.That(result.Invalid.Contains(emailAddressToAdd));
             }
             catch (Exception ex)
             {

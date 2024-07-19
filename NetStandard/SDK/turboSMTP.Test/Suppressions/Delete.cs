@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using turboSMTP.Test;
-using TurboSMTP;
 using TurboSMTP.Domain;
 using TurboSMTP.Model.Suppressions;
 
@@ -11,21 +10,18 @@ namespace TurboSMTP.Test.Suppressions
 {
     public class Delete: TestBase
     {
-        [SetUp]
-        public void Setup()
-        {
-        }
-
         [Test]
         public async Task Delete_Empty_Range()
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+            
             //Act
             try
             {
                 var result = await TS.Suppressions.DeleteRange(new List<string>());
                 //Assert
+                
                 Assert.That(!result);
             }
             catch (Exception ex)
@@ -40,11 +36,13 @@ namespace TurboSMTP.Test.Suppressions
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
-            var emailToDelete = "randomabcd";
+            
+            var emailAddressToDelete = "randomabcd";
+            
             //Act
             try
             {
-                var result = await TS.Suppressions.Delete(emailToDelete);
+                var result = await TS.Suppressions.Delete(emailAddressToDelete);
                 //Assert
                 Assert.That(result);
             }
@@ -61,12 +59,15 @@ namespace TurboSMTP.Test.Suppressions
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
-            var emailToDelete = "abcd@gmail.com";
+            
+            var emailAddressToDelete = "abcd@gmail.com";
             //Act
             try
             {
-                var addResult = await TS.Suppressions.Add($"Adding One to Delete - {DateTime.Now.ToString("dd/MM/yy HH:mm:ss")}", emailToDelete);
-                var result = await TS.Suppressions.Delete(emailToDelete);
+                await TS.Suppressions.Add($"Adding One to Delete - {GetFormatedDateTime()}", emailAddressToDelete);
+                
+                var result = await TS.Suppressions.Delete(emailAddressToDelete);
+                
                 //Assert
                 Assert.That(result);
             }
@@ -82,12 +83,16 @@ namespace TurboSMTP.Test.Suppressions
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
-            var emailsToDelete = new List<string>() { "abcd@gmail.com", "efgh@gmail.com" };
+            
+            var emailAddressesToDelete = new List<string>() { "abcd@gmail.com", "efgh@gmail.com" };
+            
             //Act
             try
             {
-                var addResult = await TS.Suppressions.AddRange($"Adding Multiple to Delete - {DateTime.Now.ToString("dd/MM/yy HH:mm:ss")}", emailsToDelete);
-                var result = await TS.Suppressions.DeleteRange(emailsToDelete);
+                await TS.Suppressions.AddRange($"Adding Multiple to Delete - {GetFormatedDateTime()}", emailAddressesToDelete);
+                
+                var result = await TS.Suppressions.DeleteRange(emailAddressesToDelete);
+                
                 //Assert
                 Assert.That(result);
             }
@@ -112,9 +117,10 @@ namespace TurboSMTP.Test.Suppressions
             //Act
             try
             {
-                var addResult = await TS.Suppressions.Add($"Adding To Delete Today Test - {DateTime.Now.ToString("dd/MM/yy HH:mm:ss")}",
-                    $"{DateTime.Now.ToString("ddMMyyyyHHmmss")}random@gmail.com"
+                await TS.Suppressions.Add($"Adding To Delete Today Test - {GetFormatedDateTime()}",
+                    $"{GetFormatedDateTimeCompressed()}random@gmail.com"
                     );
+                
                 var result = await TS.Suppressions.Delete(deleteOptions);
                 Assert.That(result);
             }
@@ -139,11 +145,13 @@ namespace TurboSMTP.Test.Suppressions
                 .Build();
                 
 
-            var addResult = await TS.Suppressions.Add($"Adding To Delete Manual Test - {DateTime.Now.ToString("dd/MM/yy HH:mm:ss")}",
-                $"{DateTime.Now.ToString("ddMMyyyyHHmmss")}random@gmail.com"
+            await TS.Suppressions.Add($"Adding To Delete Manual Test - {GetFormatedDateTime()}",
+                $"{GetFormatedDateTimeCompressed()}random@gmail.com"
                 );
+            
             //Act
             var result = await TS.Suppressions.Delete(deleteOptions);
+            
             //Assert
             Assert.That(result);
             Assert.Pass();
@@ -162,10 +170,11 @@ namespace TurboSMTP.Test.Suppressions
                 .SetSmartSearch(true)
                 .Build();
 
-            var addResult = await TS.Suppressions.Add($"Adding To Delete Manual Test - {DateTime.Now.ToString("dd/MM/yy HH:mm:ss")}",
-                $"{DateTime.Now.ToString("ddMMyyyyHHmmss")}random@gmail.com"
+            var addResult = await TS.Suppressions.Add($"Adding To Delete Manual Test - {GetFormatedDateTime()}",
+                $"{GetFormatedDateTimeCompressed()}random@gmail.com"
                 );
             //Act
+            
             var result = await TS.Suppressions.Delete(deleteOptions);
             //Assert
             Assert.That(result);
@@ -178,14 +187,12 @@ namespace TurboSMTP.Test.Suppressions
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
 
-            var ReasonContainsKeyword = "Subject Contains";
-
             var restriction = new SuppressionsRestriction[]
                 {
                     new SuppressionsRestriction()
                     {
                         By = SuppresionsRestrictionFilterBy.Reason,
-                        Filter = ReasonContainsKeyword,
+                        Filter = "Subject Contains",
                         SmartSearch = true,
                         Operator = SuppressionsRestrictionOperator.Include
                     }
@@ -197,9 +204,10 @@ namespace TurboSMTP.Test.Suppressions
                 .SetRestrictions(restriction)
                 .Build();
             
-            var addResult = await TS.Suppressions.Add($"Adding To Delete By Subject Contains - {DateTime.Now.ToString("dd/MM/yy HH:mm:ss")}",
-                $"{DateTime.Now.ToString("ddMMyyyyHHmmss")}random@gmail.com"
+            var addResult = await TS.Suppressions.Add($"Adding To Delete By Subject Contains - {GetFormatedDateTime()}",
+                $"{GetFormatedDateTimeCompressed()}random@gmail.com"
                 );
+            
             //Act
             var result = await TS.Suppressions.Delete(deleteOptions);
             //Assert

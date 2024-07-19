@@ -10,7 +10,7 @@ namespace TurboSMTP.Services
     {
         public EmailValidatorFileResults(Configuration configuration, string timeZone) : base(configuration, timeZone){}
 
-        public async Task<PagedListResults<EmailAddressValidationDetails>> GetEmailValidationDetailsByList(EmailValidatorFileResultsQueryOptions options)
+        public async Task<PagedListResults<EmailAddressValidationDetails>> Query(EmailValidatorFileResultsQueryOptions options)
         {
             var response = await API.GetValidatedEmailsByListAsync(options.FileId,options.Page, options.Limit);
             

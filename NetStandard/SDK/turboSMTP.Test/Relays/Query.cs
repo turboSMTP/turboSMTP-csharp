@@ -4,16 +4,18 @@ using System.Linq;
 using System.Threading.Tasks;
 using turboSMTP.Test;
 using TurboSMTP.Model.Relays;
+using TurboSMTP.Domain;
 
 namespace TurboSMTP.Test.Relays
 {
-    public class List : TestBase
+    public class Query : TestBase
     {
         [Test]
-        public async Task Query_Relays_With_Default_Params()
+        public async Task Query_With_Default_Params()
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+            
             var queryOptions = new RelaysQueryOptions.Builder()
                 .SetFrom(DateTime.Now.AddYears(-3))
                 .SetTo(DateTime.Now)
@@ -34,27 +36,31 @@ namespace TurboSMTP.Test.Relays
         }
 
         [Test]
-        public async Task Query_Relays_Whith_Limit()
+        public async Task Query_Whith_Limit()
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+            
             var queryOptions = new RelaysQueryOptions.Builder()
                 .SetFrom(DateTime.Now.AddYears(-3))
                 .SetTo(DateTime.Now)
                 .SetLimit(5)
                 .Build();
+            
             //Act
             var result = await TS.Relays.Query(queryOptions);
+            
             //Assert
             Assert.That(result.Records.Count <= queryOptions.Limit,$"Limit = {queryOptions.Limit} - Returned results = {result.TotalRecords}");
             Assert.Pass();
         }
 
         [Test]
-        public async Task Query_Relays_Filtered_By_Subject()
+        public async Task Query_Filtered_By_Subject()
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+            
             var queryOptions = new RelaysQueryOptions.Builder()
                 .SetFrom(DateTime.Now.AddYears(-3))
                 .SetTo(DateTime.Now)
@@ -62,13 +68,42 @@ namespace TurboSMTP.Test.Relays
                 .SetFilterBy(new[] { RelayFilterCriteria.Subject })
                 .SetFilter("team")
                 .Build();
+            
             //Act
             var result = await TS.Relays.Query(queryOptions);
+            
             //Assert
             Assert.That(result.Records.All(s => s.Subject.Contains(queryOptions.Filter)));
             Assert.Pass();
         }
 
+        public async Task Query_Filtered_By_Status()
+        {
+            //Arrange
+            var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+
+            var deliveredRelayStatuses = new RelayStatus[] {
+                RelayStatus.SUCCESS,
+                RelayStatus.OPEN,
+                RelayStatus.CLICK,
+                RelayStatus.UNSUB,
+                RelayStatus.REPORT
+            };
+
+            var queryOptions = new RelaysQueryOptions.Builder()
+                .SetFrom(DateTime.Now.AddYears(-3))
+                .SetTo(DateTime.Now)
+                .SetLimit(1000)
+                .SetRelayStatuses(deliveredRelayStatuses)
+                .Build();
+
+            //Act
+            var result = await TS.Relays.Query(queryOptions);
+
+            //Assert
+            Assert.That(result.Records.All(s => s.Subject.Contains(queryOptions.Filter)));
+            Assert.Pass();
+        }
 
     }
 }

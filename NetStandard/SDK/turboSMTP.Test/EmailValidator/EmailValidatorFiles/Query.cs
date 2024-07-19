@@ -1,25 +1,18 @@
 ﻿using NUnit.Framework;
 using System;
 using System.Threading.Tasks;
-using turboSMTP.Test;
 using TurboSMTP;
 using TurboSMTP.Model.EmailValidator;
 
-namespace TurboSMTP.Test.EmailValidator
+namespace turboSMTP.Test.EmailValidator.EmailValidatorFiles
 {
-    public class List: TestBase
+    public class Query : TestBase
     {
-        [SetUp]
-        public void Setup()
-        {
-        }
-
         [Test]
-        public async Task Retrieve_EmailValidatorLists_With_Default_Params()
+        public async Task Query_With_Default_Params()
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
-
 
             var emailValidatorFilesQueryOptions = new EmailValidatorFilesQueryOptions.Builder()
                 .SetFrom(DateTime.Now.AddYears(-3))
@@ -30,6 +23,7 @@ namespace TurboSMTP.Test.EmailValidator
             try
             {
                 var result = await TS.EmailValidatorFiles.Query(emailValidatorFilesQueryOptions);
+                
                 //Assert
                 Assert.That(result.Records.Count <= 10);
             }
@@ -41,7 +35,7 @@ namespace TurboSMTP.Test.EmailValidator
         }
 
         [Test]
-        public async Task Retrieve_EmailValidatorLists_Whith_Limit()
+        public async Task Query_Whith_Limit()
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
@@ -54,6 +48,7 @@ namespace TurboSMTP.Test.EmailValidator
 
             //Act
             var result = await TS.EmailValidatorFiles.Query(emailValidatorFilesQueryOptions);
+            
             //Assert
             Assert.That(result.Records.Count <= emailValidatorFilesQueryOptions.Limit, $"Limit = {emailValidatorFilesQueryOptions.Limit} - Returned results = {result.TotalRecords}");
             Assert.Pass();

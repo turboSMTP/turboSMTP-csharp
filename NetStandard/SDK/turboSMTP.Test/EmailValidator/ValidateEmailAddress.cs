@@ -1,32 +1,27 @@
 ﻿using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using turboSMTP.Test;
-using TurboSMTP;
+using static TurboSMTP.Model.EmailValidator.EmailAddressValidationDetails;
 
 namespace TurboSMTP.Test.EmailValidator
 {
-    public class GetFilesList: TestBase
+    public class ValidateEmailAddress: TestBase
     {
-        [SetUp]
-        public void Setup()
-        {
-        }
-
         [Test]
-        public async Task Get_FilesList_By_ID_Invalid()
+        public async Task Validate_Valid_EmailAddress()
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+            
             //Act
             try
             {
-                var result = await TS.EmailValidatorFiles.Get(5);
+                var result = await TS.emailValidator.Validate(AppConstants.ValidEmailAddresses.First());
                 //Assert
-                Assert.That(result == null);
+                Assert.That(result.Email.ToLower()== AppConstants.ValidEmailAddresses.First().ToLower());
+                Assert.That(result.Status==EmailAddressValidationStatus.Valid);
             }
             catch (SuccessException) { }
             catch (Exception ex)
@@ -36,23 +31,17 @@ namespace TurboSMTP.Test.EmailValidator
         }
 
         [Test]
-        public async Task Get_Files_List_By_ID_Valid()
+        public async Task Validate_Invalid_EmailAddress()
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
             //Act
             try
             {
-                var listId = await TS.EmailValidatorFiles.Add($"{DateTime.Now.ToString("ddMMyyyyHHmmss")}emailvalidatorlist.txt", new List<string>
-                {
-                    "sergio.b.c@gmail.com",
-                    "sergio.c.c@gmail.com"
-                });
-                Assert.That(listId > 0);
-                var result = await TS.EmailValidatorFiles.Get(listId);
+                var result = await TS.emailValidator.Validate(AppConstants.ValidEmailAddresses.First());
                 //Assert
-                Assert.That(result != null);
-                Assert.That(result.TotalEmails, Is.EqualTo(2));
+                Assert.That(result.Email.ToLower() == AppConstants.ValidEmailAddresses.First().ToLower());
+                Assert.That(result.Status != EmailAddressValidationStatus.Valid);
             }
             catch (SuccessException) { }
             catch (Exception ex)
@@ -60,5 +49,6 @@ namespace TurboSMTP.Test.EmailValidator
                 Assert.Fail(ex.Message);
             }
         }
+
     }
 }

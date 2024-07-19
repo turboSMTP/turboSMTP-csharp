@@ -8,19 +8,17 @@ namespace TurboSMTP.Test.Relays
 {
     public class Export: TestBase
     {
-        [SetUp]
-        public void Setup()
-        {
-        }
         [Test]
-        public async Task Export_Relays_With_Default_Params()
+        public async Task Export_With_Default_Params()
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+            
             var queryOptions = new RelaysExportOptions.Builder()
                 .SetFrom(DateTime.Now.AddYears(-3))
                 .SetTo(DateTime.Now)
                 .Build();
+            
             //Act
             try
             {
@@ -36,10 +34,11 @@ namespace TurboSMTP.Test.Relays
         }
 
         [Test]
-        public async Task Export_Relays_Filtered_By_Subject()
+        public async Task Export_Filtered_By_Subject()
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+            
             var queryOptions = new RelaysExportOptions.Builder()
                 .SetFrom(DateTime.Now.AddYears(-3))
                 .SetTo(DateTime.Now)
@@ -49,6 +48,7 @@ namespace TurboSMTP.Test.Relays
 
             //Act
             var result = await TS.Relays.Export(queryOptions);
+            
             //Assert
             Assert.That(result.Length > 0);
             Assert.That(result.Contains(queryOptions.Filter));
