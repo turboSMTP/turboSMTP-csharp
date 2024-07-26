@@ -18,6 +18,7 @@ namespace TurboSMTP.Domain
         public Dictionary<string, string> CustomHeaders { get; private set; }
         public string ReferenceId { get; private set; }
         public string MimeRaw { get; private set; }
+        public string CampaignID { get; private set; }
         public List<EmailAttachment> Attachments { get; private set; }
 
         public override string ToString()
@@ -34,6 +35,7 @@ namespace TurboSMTP.Domain
             sb.Append("  CustomHeaders: ").Append(CustomHeaders).Append("\n");
             sb.Append("  ReferenceId: ").Append(ReferenceId).Append("\n");
             sb.Append("  MimeRaw: ").Append(MimeRaw).Append("\n");
+            sb.Append("  CampaignID: ").Append(CampaignID).Append("\n");
             sb.Append("  Attachments: ").Append(string.Join(", ", Attachments)).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
@@ -113,6 +115,12 @@ namespace TurboSMTP.Domain
             public Builder SetMimeRaw(string mimeRaw)
             {
                 _emailMessage.MimeRaw = mimeRaw;
+                return this;
+            }
+
+            public Builder SetCampaignID(string campaignID)
+            {
+                _emailMessage.CampaignID = campaignID;
                 return this;
             }
 

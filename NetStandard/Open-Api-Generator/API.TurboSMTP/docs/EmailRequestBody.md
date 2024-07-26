@@ -15,6 +15,7 @@ Name | Type | Description | Notes
 **HtmlContent** | **string** | html content of the email | [optional] 
 **CustomHeaders** | **Dictionary&lt;string, string&gt;** | email additional headers, use any additional header like standard ones List-Unsubscribe (to allow users to easily unsubscribe), X-Entity-Ref-ID (to handle how gmail and other clients group threads), and your own ones.   | [optional] 
 **ReferenceId** | **string** | custom argument included within an email to be added to the Event Webhook response. | [optional] 
+**XCampaignID** | **string** | custom argument included within an email identify the campaign the email belongs to. | [optional] 
 **MimeRaw** | **string** | mime message which replaces content and hmtl content | [optional] 
 **Attachments** | [**List&lt;Attachment&gt;**](Attachment.md) | array of attachment objects | [optional] 
 

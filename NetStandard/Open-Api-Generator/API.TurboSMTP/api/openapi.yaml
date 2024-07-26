@@ -419,7 +419,8 @@ paths:
                     Tracking-Id: "888884433"
                     reply-to: alternative-email@domain.com
                   mime_raw: string
-                  reference_id: string
+                  reference_id: 333fe3e9-05aa-4ead-85cf-de625b0222c6
+                  X-campaign-ID: AB Test
                   attachments:
                   - content: dXBsb2FkZXIxQGdtYWlsLmNvbQ0KdXBsb2FkZXIyQGdtYWlsLmNvbQ0KYWJjMQ==
                     name: list.txt
@@ -516,6 +517,8 @@ paths:
       servers:
       - description: turboSMTP SEND production server
         url: https://api.turbo-smtp.com/api/v2
+      - description: turboSMTP SEND production server for EUROPEAN users
+        url: https://api.eu.turbo-smtp.com/api/v2
       summary: Send email message
       tags:
       - mail
@@ -3574,6 +3577,9 @@ paths:
           bydomain:
             summary: Search for recipient email domain.
             value: gmail.com
+          bycampaign:
+            summary: Search for Campaign ID.
+            value: ABC Test
         explode: true
         in: query
         name: filter
@@ -3732,6 +3738,9 @@ paths:
           bydomain:
             summary: Search for recipient email domain.
             value: gmail.com
+          bycampaign:
+            summary: Search for Campaign ID.
+            value: ABC Test
         explode: true
         in: query
         name: filter
@@ -4302,6 +4311,9 @@ components:
         bydomain:
           summary: Search for recipient email domain.
           value: gmail.com
+        bycampaign:
+          summary: Search for Campaign ID.
+          value: ABC Test
       explode: true
       in: query
       name: filter
@@ -4649,6 +4661,7 @@ components:
         content: content
         authpass: authpass
         html_content: html_content
+        X-campaign-ID: X-campaign-ID
         mime_raw: mime_raw
         from: from
         to: to
@@ -4709,6 +4722,11 @@ components:
         reference_id:
           description: custom argument included within an email to be added to the
             Event Webhook response.
+          nullable: true
+          type: string
+        X-campaign-ID:
+          description: custom argument included within an email identify the campaign
+            the email belongs to.
           nullable: true
           type: string
         mime_raw:
@@ -6177,6 +6195,7 @@ components:
           domain: gmail.com
           error: ""
           recipient_domain: electronic-arts.com
+          x_campaign_id: Offer AB Test.
         - id: 1800871904471490600
           subject: New Movies
           sender: sales@gmail.com
@@ -6184,13 +6203,10 @@ components:
           send_time: 2023-08-11 04:04:21
           status: FAIL
           domain: gmail.com
-          error: |
-            142.250.138.27 does not like recipient.\nRemote host said: 550-5.1.1 The email account that you tried to reach does not exist. Please try
-            550-5.1.1 double-checking the recipient's email address for typos or
-            550-5.1.1 unnecessary spaces. Learn more at
-            550 5.1.1  https://support.google.com/mail/?p=NoSuchUser s36-20020a05680820a400b003a36545ef49si728995oiw.292 - gsmtp
-            {199.244.74.8}{550} Giving up on 142.250.138.27.
+          error: "142.250.138.27 does not like recipient.\\nRemote host said: 550-5.1.1\
+            \ The email account does not exist."
           recipient_domain: datamart.com
+          x_campaign_id: Offer AB Test.
       properties:
         count:
           type: integer
@@ -6208,13 +6224,10 @@ components:
         subject: Business Card.
         domain: example.com
         recipient: user@gmail.com
+        x_campaign_id: Offer AB Test.
         id: 1800872493473406976
-        error: |
-          142.250.138.27 does not like recipient.\nRemote host said: 550-5.1.1 The email account that you tried to reach does not exist. Please try
-          550-5.1.1 double-checking the recipient's email address for typos or
-          550-5.1.1 unnecessary spaces. Learn more at
-          550 5.1.1  https://support.google.com/mail/?p=NoSuchUser s36-20020a05680820a400b003a36545ef49si728995oiw.292 - gsmtp
-          {199.244.74.8}{550} Giving up on 142.250.138.27.
+        error: "142.250.138.27 does not like recipient.\\nRemote host said: 550-5.1.1\
+          \ The email account does not exist."
         status: null
       properties:
         id:
@@ -6252,14 +6265,15 @@ components:
             symbol.
           example: gmail.com
           type: string
+        x_campaign_id:
+          description: Value specified in the x_campaign_id custom header to track
+            campaigns specific data.
+          example: Offer AB Test.
+          type: string
         error:
           description: Error returned when delivering the email message.
-          example: |
-            142.250.138.27 does not like recipient.\nRemote host said: 550-5.1.1 The email account that you tried to reach does not exist. Please try
-            550-5.1.1 double-checking the recipient's email address for typos or
-            550-5.1.1 unnecessary spaces. Learn more at
-            550 5.1.1  https://support.google.com/mail/?p=NoSuchUser s36-20020a05680820a400b003a36545ef49si728995oiw.292 - gsmtp
-            {199.244.74.8}{550} Giving up on 142.250.138.27.
+          example: "142.250.138.27 does not like recipient.\\nRemote host said: 550-5.1.1\
+            \ The email account does not exist."
           type: string
       type: object
     AnalyticMailStatus:
@@ -6312,6 +6326,7 @@ components:
       - sender
       - recipient
       - domain
+      - x_campaign_id
       example: domain
       type: string
     AnalyticOrderBy:

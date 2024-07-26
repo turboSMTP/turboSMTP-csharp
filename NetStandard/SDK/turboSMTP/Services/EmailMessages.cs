@@ -37,6 +37,7 @@ namespace TurboSMTP.Services
                 CustomHeaders = email.CustomHeaders,
                 ReferenceId = email.ReferenceId,
                 MimeRaw = email.MimeRaw,
+                XCampaignID = email.CampaignID,
                 Attachments = email.Attachments.Select(a =>
                     new API.TurboSMTP.Model.Attachment(a.Content, a.Name, a.Type))
                     .ToList(),

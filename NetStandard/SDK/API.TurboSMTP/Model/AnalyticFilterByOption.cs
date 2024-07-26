@@ -53,7 +53,13 @@ namespace API.TurboSMTP.Model
         /// Enum Domain for value: domain
         /// </summary>
         [EnumMember(Value = "domain")]
-        Domain = 4
+        Domain = 4,
+
+        /// <summary>
+        /// Enum XCampaignId for value: x_campaign_id
+        /// </summary>
+        [EnumMember(Value = "x_campaign_id")]
+        XCampaignId = 5
     }
 
 }

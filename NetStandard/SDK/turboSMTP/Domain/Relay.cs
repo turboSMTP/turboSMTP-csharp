@@ -17,7 +17,8 @@ namespace TurboSMTP.Domain
             RelayStatus? status = default(RelayStatus?), 
             string domain = default(string), 
             string contactDomain = default(string), 
-            string error = default(string))
+            string error = default(string),
+            string xCampaignId = default(string))
         {
             this.MessageID = messageID;
             this.Subject = subject;
@@ -28,6 +29,7 @@ namespace TurboSMTP.Domain
             this.Domain = domain;
             this.ContactDomain = contactDomain;
             this.Error = error;
+            this.XCampaignId = xCampaignId;
         }
         public RelayStatus? Status { get; set; }
         public long MessageID { get; set; }
@@ -38,6 +40,8 @@ namespace TurboSMTP.Domain
         public string Domain { get; set; }
         public string ContactDomain { get; set; }
         public string Error { get; set; }
+
+        public string XCampaignId { get; set; }
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
@@ -51,6 +55,7 @@ namespace TurboSMTP.Domain
             sb.Append("  Domain: ").Append(Domain).Append("\n");
             sb.Append("  ContactDomain: ").Append(ContactDomain).Append("\n");
             sb.Append("  Error: ").Append(Error).Append("\n");
+            sb.Append("  XCampaignId: ").Append(XCampaignId).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
         }

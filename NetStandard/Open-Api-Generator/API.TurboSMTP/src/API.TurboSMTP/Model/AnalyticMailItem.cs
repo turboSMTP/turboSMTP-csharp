@@ -48,8 +48,9 @@ namespace API.TurboSMTP.Model
         /// <param name="status">status.</param>
         /// <param name="domain">The portion of the sender´s email address after the \&quot;@\&quot; symbol..</param>
         /// <param name="contactDomain">The portion of the recipient´s email address after the \&quot;@\&quot; symbol..</param>
+        /// <param name="xCampaignId">Value specified in the x_campaign_id custom header to track campaigns specific data..</param>
         /// <param name="error">Error returned when delivering the email message..</param>
-        public AnalyticMailItem(long id = default(long), string subject = default(string), string sender = default(string), string recipient = default(string), string sendTime = default(string), AnalyticMailStatus? status = default(AnalyticMailStatus?), string domain = default(string), string contactDomain = default(string), string error = default(string))
+        public AnalyticMailItem(long id = default(long), string subject = default(string), string sender = default(string), string recipient = default(string), string sendTime = default(string), AnalyticMailStatus? status = default(AnalyticMailStatus?), string domain = default(string), string contactDomain = default(string), string xCampaignId = default(string), string error = default(string))
         {
             this.Id = id;
             this.Subject = subject;
@@ -59,6 +60,7 @@ namespace API.TurboSMTP.Model
             this.Status = status;
             this.Domain = domain;
             this.ContactDomain = contactDomain;
+            this.XCampaignId = xCampaignId;
             this.Error = error;
         }
 
@@ -119,15 +121,18 @@ namespace API.TurboSMTP.Model
         public string ContactDomain { get; set; }
 
         /// <summary>
+        /// Value specified in the x_campaign_id custom header to track campaigns specific data.
+        /// </summary>
+        /// <value>Value specified in the x_campaign_id custom header to track campaigns specific data.</value>
+        /// <example>Offer AB Test.</example>
+        [DataMember(Name = "x_campaign_id", EmitDefaultValue = false)]
+        public string XCampaignId { get; set; }
+
+        /// <summary>
         /// Error returned when delivering the email message.
         /// </summary>
         /// <value>Error returned when delivering the email message.</value>
-        /// <example>142.250.138.27 does not like recipient.\nRemote host said: 550-5.1.1 The email account that you tried to reach does not exist. Please try
-550-5.1.1 double-checking the recipient&#39;s email address for typos or
-550-5.1.1 unnecessary spaces. Learn more at
-550 5.1.1  https://support.google.com/mail/?p&#x3D;NoSuchUser s36-20020a05680820a400b003a36545ef49si728995oiw.292 - gsmtp
-{199.244.74.8}{550} Giving up on 142.250.138.27.
-</example>
+        /// <example>142.250.138.27 does not like recipient.\nRemote host said: 550-5.1.1 The email account does not exist.</example>
         [DataMember(Name = "error", EmitDefaultValue = false)]
         public string Error { get; set; }
 
@@ -147,6 +152,7 @@ namespace API.TurboSMTP.Model
             sb.Append("  Status: ").Append(Status).Append("\n");
             sb.Append("  Domain: ").Append(Domain).Append("\n");
             sb.Append("  ContactDomain: ").Append(ContactDomain).Append("\n");
+            sb.Append("  XCampaignId: ").Append(XCampaignId).Append("\n");
             sb.Append("  Error: ").Append(Error).Append("\n");
             sb.Append("}\n");
             return sb.ToString();

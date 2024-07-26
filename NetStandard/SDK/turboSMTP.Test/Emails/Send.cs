@@ -62,6 +62,7 @@ namespace TurboSMTP.Test.Emails
                 .AddCustomHeader("Tracking-Id", "888884433")
                 .AddCustomHeader("reply-to", "alternative-email@domain.com")
                 .SetReferenceId($"SystemRef{new Random().Next()}")
+                .SetCampaignID("TestSDK")
                 .AddAttachment(emailAttachment)
                 .Build();
 
@@ -105,6 +106,7 @@ namespace TurboSMTP.Test.Emails
                 .AddCustomHeader("Tracking-Id", "888884433")
                 .AddCustomHeader("reply-to", "alternative-email@domain.com")
                 .SetReferenceId($"SystemRef{new Random().Next()}")
+                .SetCampaignID("TestSDK")
                 .AddAttachment(emailAttachment_1)
                 .AddAttachment(emailAttachment_2)
                 .Build();

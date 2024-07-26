@@ -26,26 +26,6 @@ namespace TurboSMTP.Services
             TimeZone = timeZone;
         }
 
-        private PagedListResults<Relay> GetPagedListResults(AnalyticsListSucessResponsetBody response)
-        {
-            return new PagedListResults<Relay>()
-            {
-                TotalRecords = response.Count,
-                Records = response.Results.Select(r => new Relay(
-                    r.Id,
-                    r.Subject,
-                    r.Sender,
-                    r.Recipient,
-                    r.SendTime,
-                    (RelayStatus)r.Status.Value,
-                    r.Domain,
-                    r.ContactDomain,
-                    r.Error
-                    )
-                ).ToList()
-            };
-        }
-
         public async Task<PagedListResults<Relay>> Query(RelaysQueryOptions queryOptions)
         {
 
@@ -63,7 +43,23 @@ namespace TurboSMTP.Services
                 TimeZone
                 );
 
-            return GetPagedListResults(response);
+            return new PagedListResults<Relay>()
+            {
+                TotalRecords = response.Count,
+                Records = response.Results.Select(r => new Relay(
+                    r.Id,
+                    r.Subject,
+                    r.Sender,
+                    r.Recipient,
+                    r.SendTime,
+                    (RelayStatus)r.Status.Value,
+                    r.Domain,
+                    r.ContactDomain,
+                    r.Error,
+                    r.XCampaignId
+                    )
+                ).ToList()
+            };
         }
 
         public async Task<string> Export(RelaysExportOptions options)

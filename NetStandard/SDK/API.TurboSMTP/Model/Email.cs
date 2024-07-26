@@ -43,9 +43,10 @@ namespace API.TurboSMTP.Model
         /// <param name="htmlContent">html content of the email.</param>
         /// <param name="customHeaders">email additional headers, use any additional header like standard ones List-Unsubscribe (to allow users to easily unsubscribe), X-Entity-Ref-ID (to handle how gmail and other clients group threads), and your own ones.  .</param>
         /// <param name="referenceId">custom argument included within an email to be added to the Event Webhook response..</param>
+        /// <param name="xCampaignID">custom argument included within an email identify the campaign the email belongs to..</param>
         /// <param name="mimeRaw">mime message which replaces content and hmtl content.</param>
         /// <param name="attachments">array of attachment objects.</param>
-        public Email(string from = default(string), string to = default(string), string subject = default(string), string cc = default(string), string bcc = default(string), string content = default(string), string htmlContent = default(string), Dictionary<string, string> customHeaders = default(Dictionary<string, string>), string referenceId = default(string), string mimeRaw = default(string), List<Attachment> attachments = default(List<Attachment>))
+        public Email(string from = default(string), string to = default(string), string subject = default(string), string cc = default(string), string bcc = default(string), string content = default(string), string htmlContent = default(string), Dictionary<string, string> customHeaders = default(Dictionary<string, string>), string referenceId = default(string), string xCampaignID = default(string), string mimeRaw = default(string), List<Attachment> attachments = default(List<Attachment>))
         {
             this.From = from;
             this.To = to;
@@ -56,6 +57,7 @@ namespace API.TurboSMTP.Model
             this.HtmlContent = htmlContent;
             this.CustomHeaders = customHeaders;
             this.ReferenceId = referenceId;
+            this.XCampaignID = xCampaignID;
             this.MimeRaw = mimeRaw;
             this.Attachments = attachments;
         }
@@ -124,6 +126,13 @@ namespace API.TurboSMTP.Model
         public string ReferenceId { get; set; }
 
         /// <summary>
+        /// custom argument included within an email identify the campaign the email belongs to.
+        /// </summary>
+        /// <value>custom argument included within an email identify the campaign the email belongs to.</value>
+        [DataMember(Name = "X-campaign-ID", EmitDefaultValue = true)]
+        public string XCampaignID { get; set; }
+
+        /// <summary>
         /// mime message which replaces content and hmtl content
         /// </summary>
         /// <value>mime message which replaces content and hmtl content</value>
@@ -154,6 +163,7 @@ namespace API.TurboSMTP.Model
             sb.Append("  HtmlContent: ").Append(HtmlContent).Append("\n");
             sb.Append("  CustomHeaders: ").Append(CustomHeaders).Append("\n");
             sb.Append("  ReferenceId: ").Append(ReferenceId).Append("\n");
+            sb.Append("  XCampaignID: ").Append(XCampaignID).Append("\n");
             sb.Append("  MimeRaw: ").Append(MimeRaw).Append("\n");
             sb.Append("  Attachments: ").Append(Attachments).Append("\n");
             sb.Append("}\n");

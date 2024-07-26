@@ -156,6 +156,13 @@ namespace API.TurboSMTP.Client
                                 {"description", "turboSMTP SEND production server"}
                             }
                         },
+                        {
+                            new Dictionary<string, object>
+                            {
+                                {"url", "https://api.eu.turbo-smtp.com/api/v2"},
+                                {"description", "turboSMTP SEND production server for EUROPEAN users"}
+                            }
+                        },
                     }
                 },
             };
