@@ -4,6 +4,12 @@ namespace turboSMTP.Test
 {
     internal static class AppConstants
     {
+        public static readonly string ConsumerKey = "1ef0eef86f089b18cb610532beecf72e";
+        public static readonly string ConsumerSecret = "GIx7Z0OncXf9oANe8z3gUQ6wYPtJH21d";
+
+        public static readonly string ServerUrl = "https://staging.api.serversmtp.com/api/v2";
+        public static readonly string SendServerUrl = "https://api.turbo-smtp.com/api/v2";
+
         public static readonly string EmailSender = "msaad@emailchef.com";
         public static readonly List<string> ValidEmailAddresses = new List<string>()
         {

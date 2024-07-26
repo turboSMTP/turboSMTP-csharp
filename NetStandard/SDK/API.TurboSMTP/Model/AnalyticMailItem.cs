@@ -122,12 +122,7 @@ namespace API.TurboSMTP.Model
         /// Error returned when delivering the email message.
         /// </summary>
         /// <value>Error returned when delivering the email message.</value>
-        /// <example>142.250.138.27 does not like recipient.\nRemote host said: 550-5.1.1 The email account that you tried to reach does not exist. Please try
-//550-5.1.1 double-checking the recipient&#39;s email address for typos or
-//550-5.1.1 unnecessary spaces. Learn more at
-//550 5.1.1  https://support.google.com/mail/?p&#x3D;NoSuchUser s36-20020a05680820a400b003a36545ef49si728995oiw.292 - gsmtp
-//{199.244.74.8}{550} Giving up on 142.250.138.27.
-//</example>
+        /// <example></example>
         [DataMember(Name = "error", EmitDefaultValue = false)]
         public string Error { get; set; }
 

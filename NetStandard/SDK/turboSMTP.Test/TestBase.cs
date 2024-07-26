@@ -12,10 +12,10 @@ namespace turboSMTP.Test
         public void GlobalSetup()
         {
             _InitalConfig = new TurboSMTPClientConfiguration.Builder()
-                .SetConsumerKey("1ef0eef86f089b18cb610532beecf72e")
-                .SetConsumerSecret("GIx7Z0OncXf9oANe8z3gUQ6wYPtJH21d")
-                .SetServerURL("https://staging.api.serversmtp.com/api/v2")
-                .SetSendServerURL("https://api.turbo-smtp.com/api/v2")
+                .SetConsumerKey(AppConstants.ConsumerKey)
+                .SetConsumerSecret(AppConstants.ConsumerSecret)
+                .SetServerURL(AppConstants.ServerUrl)
+                .SetSendServerURL(AppConstants.SendServerUrl)
                 .SetTimeZone("-03:00")
                 .Build();
         }
