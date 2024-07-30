@@ -7,13 +7,13 @@ namespace turboSMTP.Test
         public static readonly string ConsumerKey = "1ef0eef86f089b18cb610532beecf72e";
         public static readonly string ConsumerSecret = "GIx7Z0OncXf9oANe8z3gUQ6wYPtJH21d";
 
-        public static readonly string ServerUrl = "https://staging.api.serversmtp.com/api/v2";
+        public static readonly string ServerUrl = "https://pro.api.serversmtp.com/api/v2";
         public static readonly string SendServerUrl = "https://api.turbo-smtp.com/api/v2";
 
         public static readonly string EmailSender = "msaad@emailchef.com";
         public static readonly List<string> ValidEmailAddresses = new List<string>()
         {
-            "sergio.a.matteoda@gmail.com",
+            "sergioamatteoda@gmail.com",
             "sergio.test2@turbo-smtp.com"
         };
         public static readonly List<string> InvalidEmailAddresses = new List<string>()

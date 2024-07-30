@@ -64,12 +64,12 @@ namespace TurboSMTP.Services
                 SmartSearch = options.SmartSearch,
                 Orderby = (SuppressionOrderBy)options.OrderBy,
                 Ordertype = (API.TurboSMTP.Model.OrderType)options.OrderType,
-                Restrict = options.Restrictions.Select(r => new SuppressionRestriction(
+                Restrict = options.Restrictions != null ? options.Restrictions.Select(r => new SuppressionRestriction(
                     (SuppressionRestrictBy)r.By,
                     (SuppressionOperator)r.Operator,
                     r.Filter,
                     r.SmartSearch
-                )).ToList(),
+                )).ToList() : null
             };
             var response = await API.FilterSuppressionsAsync(suppressionFilterOrderPageRequestBody);
             return GetPagedListResults(response);
@@ -83,12 +83,12 @@ namespace TurboSMTP.Services
                 Filter = options.Filter,
                 FilterBy = options.FilterBy != null ? options.FilterBy.Select(f => (SuppressionSource)f).ToList() : null,
                 SmartSearch = options.SmartSearch,
-                Restrict = options.Restrictions.Select(r => new SuppressionRestriction(
+                Restrict = options.Restrictions != null ? options.Restrictions.Select(r => new SuppressionRestriction(
                     (SuppressionRestrictBy)r.By,
                     (SuppressionOperator)r.Operator,
                     r.Filter,
                     r.SmartSearch
-                )).ToList()
+                )).ToList() : null
             });
 
             return response;

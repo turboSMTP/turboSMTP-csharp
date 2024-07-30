@@ -19,6 +19,8 @@ namespace TurboSMTP.Services
 
         public async Task<int> Add(string filename, List<string> emailAddresses)
         {
+            if (emailAddresses == null || emailAddresses.Count==0) { throw new ArgumentException("emailAddress"); }
+            
             string tempFolderPath = Path.Combine(Path.GetTempPath(), "TSSDK");
             EmailValidationUploadResponse res;
 

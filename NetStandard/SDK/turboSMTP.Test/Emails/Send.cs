@@ -98,7 +98,7 @@ namespace TurboSMTP.Test.Emails
             var emailMessage = new EmailMessage.Builder()
                 .SetFrom(AppConstants.EmailSender)
                 .AddTo(AppConstants.ValidEmailAddresses.First())
-                .SetSubject($"Full-Email-Files-Attached - {{GetFormatedDateTime()")
+                .SetSubject($"Full-Email-Files-Attached - {GetFormatedDateTime()}")
                 .SetContent("This is the text version")
                 .SetHtmlContent("This is <b>html</b> content<br/><br/>")
                 .AddCustomHeader("List-Unsubscribe", "<https://www.example.com/unlist?id=8822772727>")

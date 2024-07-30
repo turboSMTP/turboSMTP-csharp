@@ -38,9 +38,9 @@ namespace TurboSMTP.Test.EmailValidator
             //Act
             try
             {
-                var result = await TS.emailValidator.Validate(AppConstants.ValidEmailAddresses.First());
+                var result = await TS.emailValidator.Validate(AppConstants.InvalidEmailAddresses.First());
                 //Assert
-                Assert.That(result.Email.ToLower() == AppConstants.ValidEmailAddresses.First().ToLower());
+                Assert.That(result.Email.ToLower() == AppConstants.InvalidEmailAddresses.First().ToLower());
                 Assert.That(result.Status != EmailAddressValidationStatus.Valid);
             }
             catch (SuccessException) { }

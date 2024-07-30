@@ -28,12 +28,12 @@ namespace turboSMTP.Test
 
         public string GetFormatedDateTime()
         {
-            return DateTime.Now.ToString("dd/MM/YYYY HH:mm:ss");
+            return DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
         }
 
         public string GetFormatedDateTimeCompressed()
         {
-            return DateTime.Now.ToString("ddMMYYYYHHmmss");
+            return DateTime.Now.ToString("ddMMyyyyHHmmss");
         }
     }
 }

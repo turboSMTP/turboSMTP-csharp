@@ -41,15 +41,17 @@ namespace turboSMTP.Test.EmailValidator.EmailValidatorFiles
             //Act
             try
             {
-                fileId = await TS.EmailValidatorFiles.Add(
-                    $"{GetFormatedDateTimeCompressed()}-EmailvalidatorFile.txt",new List<string>());
-                Assert.That(fileId > 0);
+                await TS.EmailValidatorFiles.Add($"{GetFormatedDateTimeCompressed()}-EmailvalidatorFile.txt",
+                    new List<string>());
+            }
+            catch (ArgumentException ex)
+            {
+                Assert.Pass(ex.Message );
             }
             catch (Exception ex)
             {
                 Assert.Fail(ex.Message);
             }
-            Assert.Pass($"List Id: {fileId}");
         }
     }
 }
