@@ -128,6 +128,7 @@ var TSClient = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
 ### TurboSMTP Client Hello World Email example
 
 ```csharp
+using System.Threading.Tasks;
 using TurboSMTP;
 using TurboSMTP.Domain;
 
@@ -135,7 +136,7 @@ namespace ConsoleApp
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             //Create an Email Message
             var emailMessage = new EmailMessage.Builder()
@@ -155,4 +156,4 @@ namespace ConsoleApp
 }
 ```
 
-**After executing the above code, `response.StatusCode` should be `202` and you should have an email in the inbox of the `to` recipient. You can check the status of your email [in the UI](https://app.sendgrid.com/email_activity?). Alternatively, we can post events to a URL of your choice using our [Event Webhook](https://docs.sendgrid.com/for-developers/tracking-events/getting-started-event-webhook). This gives you data about the events that occur as Twilio SendGrid processes your email.**              
+*After executing the above code, `result.Message` should be `OK` and `MessageID` should contain a reference number to your sending operation, and you should have an email in the inbox of the `to` recipient. You can check the status of your email [in the UI](https://dashboard.serversmtp.com/analytics/overview), or using **TurboSMTPClient.Relays.Query()** method. Alternatively, we can post events to a URL of your choice using our [Event Webhooks](https://serversmtp.com/event-webhook-reference/). This gives you information about the events that occur as turboSMTP processes your email.*              
