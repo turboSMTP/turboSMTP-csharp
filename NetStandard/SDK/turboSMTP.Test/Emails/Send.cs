@@ -31,7 +31,7 @@ namespace TurboSMTP.Test.Emails
                 var result = await TS.Emails.Send(emailMessage);
                 //Assert
                 Assert.That(result.Message == "OK");
-                Assert.That(result.Mid > 0);
+                Assert.That(result.MessageID > 0);
             }
             catch (Exception ex)
             {
@@ -72,7 +72,7 @@ namespace TurboSMTP.Test.Emails
                 var result = await TS.Emails.Send(emailMessage);
                 //Assert
                 Assert.That(result.Message == "OK");
-                Assert.That(result.Mid > 0);
+                Assert.That(result.MessageID > 0);
             }
             catch (Exception ex)
             {
@@ -117,7 +117,7 @@ namespace TurboSMTP.Test.Emails
                 var result = await TS.Emails.Send(emailMessage);
                 //Assert
                 Assert.That(result.Message == "OK");
-                Assert.That(result.Mid > 0);
+                Assert.That(result.MessageID > 0);
             }
             catch (Exception ex)
             {

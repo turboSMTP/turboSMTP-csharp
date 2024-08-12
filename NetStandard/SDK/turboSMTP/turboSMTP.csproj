@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Model\EmailValidator\EmailValidatorFileResultsQueryOptions.cs" />
+    <Compile Include="Model\Email\SendDetails.cs" />
     <Compile Include="Model\Relays\RelaysExportOptions.cs" />
     <Compile Include="Model\Relays\RelaysQueryOptions.cs" />
     <Compile Include="Model\Relays\RelaysBaseOptions.cs" />

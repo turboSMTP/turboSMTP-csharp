@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using TurboSMTP.Domain;
+using TurboSMTP.Model.Email;
 using TurboSMTP.Model.Extensions;
 
 namespace TurboSMTP.Services
@@ -23,7 +24,7 @@ namespace TurboSMTP.Services
             API = new MailApi(configuration);
         }
 
-        public async Task<SendSucessResponsetBody> Send(EmailMessage email)
+        public async Task<SendDetails> Send(EmailMessage email)
         {
             var emailRequest = new EmailRequestBody()
             {
@@ -42,7 +43,8 @@ namespace TurboSMTP.Services
                     new API.TurboSMTP.Model.Attachment(a.Content, a.Name, a.Type))
                     .ToList(),
             };
-            return await API.SendEmailAsync(emailRequest);
+            var sendResult = await API.SendEmailAsync(emailRequest);
+            return new SendDetails(sendResult.Message, sendResult.Mid);
         }
     }
 }

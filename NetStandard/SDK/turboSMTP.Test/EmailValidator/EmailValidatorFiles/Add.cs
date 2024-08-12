@@ -37,7 +37,6 @@ namespace turboSMTP.Test.EmailValidator.EmailValidatorFiles
         {
             //Arrange
             var TS = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
-            int fileId = 0;
             //Act
             try
             {
