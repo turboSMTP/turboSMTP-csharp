@@ -1,9 +1,11 @@
-[authentication]: https://documentation.mailgun.com/en/latest/api-intro.html#authentication-1
 [api_keys]: https://app.mailgun.com/app/account/security/api_keys
 [turboSMTP_home]: https://serversmtp.com/
 [api_reference]: https://serversmtp.com/turbo-api/
-[base_url_documentation]: https://documentation.mailgun.com/en/latest/api-intro.html#base-url-1
-[changes-file]: ./CHANGELOG.md
+[turboSMTP_sign_up]: https://serversmtp.com/en/tsmtpregistration1.php
+[turboSMTP_analytics_dashboard]: https://dashboard.serversmtp.com/analytics/overview
+[turboSMTP_webhooks_reference]: https://serversmtp.com/event-webhook-reference/
+[turboSMTP_about_us]: https://serversmtp.com/about-us/
+[turboSMTP_contact_us]: https://serversmtp.com/contact-us/
 
 <img class="header-image is-logo-image" alt="smtp mail server – professional SMTP service provider" src="https://serversmtp.com/wp-content/uploads/2022/02/logo_2021-2.svg" width="290" height="56">
 
@@ -13,9 +15,6 @@ The **Official turboSMTP C#**, .NetStandard, .NetCore SDK - enables .Net Develop
 * [turboSMTP Home][turboSMTP_home]
 * [turboSMTP API documentation][api_reference]
   
-[//]: # (* [Mailgun authentication documentation][authentication])
-[//]: # (* [Base URL Documentation][base_url_documentation])
-
 ## Table of contents
 
 - [Release notes](#release-notes)
@@ -31,15 +30,15 @@ The **Official turboSMTP C#**, .NetStandard, .NetCore SDK - enables .Net Develop
   - [TurboSMTP Client Initialization](#turbosmtp-client-initialization)
   - [TurboSMTP Client Hello World Email example](#turbosmtp-client-hello-world-email-example)
 - [Usage](#usage)
-  - [SDK Library Documentation]
-  - [Common SDK Use Cases Examples]
+  - [SDK Library Documentation](sdk-library-documentation)
+  - [Common SDK Use Cases Examples](common-sdk-use-cases-examples)
 - [Contribute](#contribute)
-  - [Feature Requests]
-  - [Bug Reports]
-- [Troubleshooting]
-- [About]
-- [Support]
-- [License]
+  - [Feature Requests](#feature-requests)
+  - [Bug Reports](#bug-reports)
+- [Troubleshooting](#troubleshooting)
+- [About](#about)
+- [Support](#support)
+- [License](#license)
 
 ## Release notes
 
@@ -50,7 +49,7 @@ Changes to the SDK beginning with version 2.0.0 (August 2024) are tracked in [CH
 ### Requirements
 
 - **.NET Framework 4.8+**.
-- **A turboSMTP account**, [sign up for free](https://serversmtp.com/en/tsmtpregistration1.php) to send up to 6.000 FREE emails per month (No Obligation - No Credit card required).
+- **A turboSMTP account**, [sign up for free][turboSMTP_sign_up] to send up to 6.000 FREE emails per month (No Obligation - No Credit card required).
 
 ### API Key
 
@@ -156,4 +155,30 @@ namespace ConsoleApp
 }
 ```
 
-*After executing the above code, `result.Message` should be `OK` and `MessageID` should contain a reference number to your sending operation, and you should have an email in the inbox of the `to` recipient. You can check the status of your email [in the UI](https://dashboard.serversmtp.com/analytics/overview), or using **TurboSMTPClient.Relays.Query()** method. Alternatively, we can post events to a URL of your choice using our [Event Webhooks](https://serversmtp.com/event-webhook-reference/). This gives you information about the events that occur as turboSMTP processes your email.*              
+*After executing the above code, `result.Message` should be `OK` and `MessageID` should contain a reference number to your sending operation, and you should have an email in the inbox of the `to` recipient. You can check the status of your email [in the UI][turboSMTP_analytics_dashboard], or using **TurboSMTPClient.Relays.Query()** method. Alternatively, we can post events to a URL of your choice using our [Event Webhooks][turboSMTP_webhooks_reference]. This gives you information about the events that occur as turboSMTP processes your email.* 
+
+# Usage
+
+- [SDK Library Documentation](USAGE.md)
+- [Common SDK Use Cases Examples](USE_CASES.md)
+
+# Contribute
+
+- [Feature Requests](CONTRIBUTING.md#feature-request)
+- [Bug Reports](CONTRIBUTING.md#submit-a-bug-report)
+
+# Troubleshooting
+
+Please see our [troubleshooting guide](TROUBLESHOOTING.md) for common library issues.
+
+# About
+
+turboSMTP-csharp is maintained and funded by [Turbo SMTP][turboSMTP_about_us] Company. The names and logos for turboSMTP-csharp are trademarks of TurboSMTP Company.
+
+# Support
+
+If you need help using Turbo SMTP SDK, please check the [TurboSMTP Support Help Center][turboSMTP_contact_us].
+
+# License
+
+[The MIT License (MIT)](LICENSE)
