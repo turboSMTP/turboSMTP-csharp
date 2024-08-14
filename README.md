@@ -164,6 +164,16 @@ namespace ConsoleApp
 
 # Contribute
 
+Thank you for considering contributing to our SDK! We welcome all forms of contributions, including bug reports and feature requests. 
+
+Your feedback is invaluable in helping us improve and expand our SDK, please refere to our [CONTRIBUTING](CONTRIBUTING.md) guide for details.
+
+For any inquiries, you can contact us at the following email address:
+
+**Email:** [csharp-sdk@turbo-smtp](mailto:csharp-sdk@turbo-smtp.com)
+
+Quick links:
+
 - [Feature Requests](CONTRIBUTING.md#feature-request)
 - [Bug Reports](CONTRIBUTING.md#submit-a-bug-report)
 
