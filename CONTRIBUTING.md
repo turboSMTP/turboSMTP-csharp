@@ -1,3 +1,5 @@
+[sdk_email]: mailto:skd@turbo-smtp.com
+
 # Contributing to Our SDK Project
 
 Thank you for considering contributing to our SDK! We welcome all forms of contributions, including bug reports and feature requests. 
@@ -36,7 +38,7 @@ We are always looking to improve our turboSMTP SDK and add new features. If you 
 
 ## Contact
 
-If you have any questions or need further assistance, feel free to contact us at: [csharp-sdk@turbo-smtp](mailto:csharp-sdk@turbo-smtp.com)
+If you have any questions or need further assistance, feel free to contact us at: [sdk@turbo-smtp][]
 
 We appreciate your contributions and look forward to collaborating with you!
 

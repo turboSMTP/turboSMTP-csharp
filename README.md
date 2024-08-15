@@ -33,8 +33,9 @@ The **Official turboSMTP C#**, .NetStandard, .NetCore SDK - enables .Net Develop
   - [SDK Library Documentation](USAGE.md)
   - [Common SDK Use Cases Examples](USE_CASES.md)
 - [Contribute](#contribute)
-  - [Feature Requests](CONTRIBUTING.md#feature-request)
-  - [Bug Reports](CONTRIBUTING.md#submit-a-bug-report)
+  - [Reporting Bugs](CONTRIBUTING.md#reporting-bugs)
+  - [Requesting New Features](CONTRIBUTING.md#requesting-new-features)
+  - [How to Submit an Issue or Feature Request](CONTRIBUTING.md#how-to-submit-an-issue-or-feature-request)
 - [Troubleshooting](#troubleshooting)
 - [About](#about)
 - [Support](#support)
@@ -174,8 +175,9 @@ For any inquiries, you can contact us at the following email address:
 
 Quick links:
 
-- [Feature Requests](CONTRIBUTING.md#feature-request)
-- [Bug Reports](CONTRIBUTING.md#submit-a-bug-report)
+- [Reporting Bugs](CONTRIBUTING.md#reporting-bugs)
+- [Requesting New Features](CONTRIBUTING.md#requesting-new-features)
+- [How to Submit an Issue or Feature Request](CONTRIBUTING.md#how-to-submit-an-issue-or-feature-request)
 
 # Troubleshooting
 
