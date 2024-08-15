@@ -193,4 +193,4 @@ If you need help using Turbo SMTP SDK, please check the [TurboSMTP Support Help 
 
 # License
 
-[The MIT License (MIT)](LICENSE)
+This SDK is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
