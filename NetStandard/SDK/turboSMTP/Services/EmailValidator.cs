@@ -1,15 +1,8 @@
-﻿using API.TurboSMTP.Api;
-using API.TurboSMTP.Client;
+﻿using API.TurboSMTP.Client;
 using API.TurboSMTP.Model;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using TurboSMTP.Domain;
 using TurboSMTP.Model.EmailValidator;
-using TurboSMTP.Model.Shared;
 using EmailValidatorSubscription = TurboSMTP.Domain.EmailValidatorSubscription;
 
 namespace TurboSMTP.Services

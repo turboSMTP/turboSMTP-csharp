@@ -16,7 +16,7 @@ namespace TurboSMTP.Test.EmailValidator
             //Act
             try
             {
-                var result = await TS.emailValidator.GetEmailValidatorSubscription();
+                var result = await TS.EmailValidator.GetEmailValidatorSubscription();
                 //Assert
                 Assert.That(result != null);
                 Assert.Pass(result.ToString());
