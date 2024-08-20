@@ -1,4 +1,4 @@
-[sdk_email]: mailto:skd@turbo-smtp.com
+[sdk_email]: mailto:sdk@turbo-smtp.com
 
 # Contributing to Our SDK Project
 
@@ -38,7 +38,7 @@ We are always looking to improve our turboSMTP SDK and add new features. If you 
 
 ## Contact
 
-If you have any questions or need further assistance, feel free to contact us at: [sdk@turbo-smtp][]
+If you have any questions or need further assistance, feel free to contact us at: [sdk@turbo-smtp][sdk_email]
 
 We appreciate your contributions and look forward to collaborating with you!
 

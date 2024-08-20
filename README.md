@@ -1,4 +1,3 @@
-[api_keys]: https://app.mailgun.com/app/account/security/api_keys
 [turboSMTP_home]: https://serversmtp.com/
 [api_reference]: https://serversmtp.com/turbo-api/
 [turboSMTP_sign_up]: https://serversmtp.com/en/tsmtpregistration1.php
@@ -6,6 +5,7 @@
 [turboSMTP_webhooks_reference]: https://serversmtp.com/event-webhook-reference/
 [turboSMTP_about_us]: https://serversmtp.com/about-us/
 [turboSMTP_contact_us]: https://serversmtp.com/contact-us/
+[sdk_email]: mailto:sdk@turbo-smtp.com
 
 <img class="header-image is-logo-image" alt="smtp mail server – professional SMTP service provider" src="https://serversmtp.com/wp-content/uploads/2022/02/logo_2021-2.svg" width="290" height="56">
 
@@ -171,7 +171,7 @@ Your feedback is invaluable in helping us improve and expand our SDK, please ref
 
 For any inquiries, you can contact us at the following email address:
 
-**Email:** [csharp-sdk@turbo-smtp](mailto:csharp-sdk@turbo-smtp.com)
+**Email:** [sdk@turbo-smtp][sdk_email]
 
 Quick links:
 
