@@ -50,7 +50,7 @@ var TSClient = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
 
 ## Send Email Messages
 
-The Send method is an asynchronous task that handles the process of sending an email message. The method takes an `EmailMessage` object as input and returns a `SendDetails` object, which contains the result of the email sending operation.
+The **Send** method is an asynchronous operation that handles the process of sending an email message. The method takes an `EmailMessage` object as input and returns a `SendDetails` object, which contains the result of the email sending operation.
 
 ```csharp
 //Create an instance of EmailMessage
@@ -75,4 +75,45 @@ Console.WriteLine(sendResult.MessageID);
 
 ## Query Relays Details
 
+The **Query** method is an asynchronous operation designed to retrieve paginated results of relay data based on specified query options. The method takes a `RelaysQueryOptions` object as input and returns PagedListResults<Relay> object, which contains the total number of records and a list of Relay objects.
+
+```csharp
+//Create an instance of RealysQueryOptions
+var queryOptions = new RelaysQueryOptions.Builder()
+                .SetFrom(DateTime.Now.AddYears(-3))
+                .SetTo(DateTime.Now)
+                .Build();
+
+//Create a new instance of TurboSMTPClient
+var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+
+//Query Relays
+var pagedList = await client.Relays.Query(queryOptions);
+
+//Evaluate the total ammount of records according to the queryOptions.
+Console.WriteLine(pagedList.TotalRecords);
+
+//Evaluate the Subject of the fist Relay.
+Console.WriteLine(pagedList.Records.First().Subject);
+```
+
 ## Export Relays Details To CSV
+
+The **Export** method is an asynchronous operation designed to export relay data based on specified export options. The method takes a `RelaysExportOptions` object as input  and returns the data in CSV formated string, which can then be saved or further processed.
+
+```csharp
+//Create an instance of RealysExportOptions
+var exportOptions = new RelaysExportOptions.Builder()
+                .SetFrom(DateTime.Now.AddYears(-3))
+                .SetTo(DateTime.Now)
+                .Build();
+
+//Create a new instance of TurboSMTPClient
+var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+
+//Export Relays
+var csvContent = await client.Relays.Export(exportOptions);
+
+//Save content to a CSV File.
+File.WriteAllText(filePath, csvContent);
+```
