@@ -117,3 +117,123 @@ var csvContent = await client.Relays.Export(exportOptions);
 //Save content to a CSV File.
 File.WriteAllText(filePath, csvContent);
 ```
+
+# Suppressions
+
+## Add a Single Suppression
+
+The **Add** method is an asynchronous operation that handles the process of adding an email address to the suppressions list. The method takes the *reason for the suppression* and the *email address to add to the suppresions list* as input and returns a `SuppressionsAddResult` object, which contains the result of the Add operation.
+
+```csharp
+var suppressionReason = "Manual Processing of Removal Request";
+var suppressionEmailAddress = "recipient@recipient.domain.com";
+
+//Create a new instance of TurboSMTPClient
+var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+
+//Add the Email Address to the Suppressions List.
+var addSuppressionsResult = await client.Suppressions.Add(suppressionReason,suppressionEmailAddress);
+
+//Evaluate if the Suppression was Successfully Processed.
+if (addSuppressionsResult.Valid.Contains(suppressionEmailAddress))
+{
+    Console.WriteLine("OK");
+}
+```
+
+## Add Multiple Suppressions
+
+The **AddRange** method is an asynchronous operation that handles the process of adding multiple email addresses to the suppressions list. The method takes the *reason for the suppressions* and a list of *email addresses to add to the suppresions list* as input and returns a `SuppressionsAddResult` object, which contains the result of the AddRange operation.
+
+```csharp
+var suppressionReason = "Manual Processing of Removal Request";
+
+//Create a Test List of email addresses
+var testEmailAddresses = new List<string>()
+{
+    "first-recipient@recipient.domain.com",
+    "second-recipient@recipient.domain.com",
+    "invalid-recipient@malformed-domain"
+};
+
+//Create a new instance of TurboSMTPClient
+var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+
+//Add the Test Mail Addresses to the Suppressions List
+var addSuppressionsResult = await client.Suppressions.AddRange(suppressionReason, testEmailAddresses);
+
+//Evaluate Suppressions Processing Result
+foreach (var validEmailAddress in addSuppressionsResult.Valid)
+{
+    Console.WriteLine($"Valid: {validEmailAddress}");
+}
+foreach (var inValidEmailAddress in addSuppressionsResult.Invalid)
+{
+    Console.WriteLine($"Invalid: {inValidEmailAddress}");
+}
+```
+
+## Query Suppressions
+
+The **Query** method is an asynchronous operation designed to retrieve paginated results of suppressions data based on specified query options. The method takes a `SuppressionsQueryOptions` object as input and returns PagedListResults<Suppression> object, which contains the total number of records and a list of Suppresion objects.
+
+```csharp
+//Create an instance of SuppressionsQueryOptions
+var queryOptions = new SuppressionsQueryOptions.Builder()
+                .SetFrom(DateTime.Now.AddYears(-3))
+                .SetTo(DateTime.Now)
+                .Build();
+
+//Create a new instance of TurboSMTPClient
+var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+
+//Query Suppressions
+var pagedList = await client.Suppressions.Query(queryOptions);
+
+//Evaluate the total ammount of records according to the queryOptions.
+Console.WriteLine(pagedList.TotalRecords);
+
+//Evaluate the Recipient of the fist Suppression.
+Console.WriteLine(pagedList.Records.First().Recipient);
+```
+
+## Export Suppressions To CSV
+
+The **Export** method is an asynchronous operation designed to export suppressions data based on specified export options. The method takes a `SuppressionsExportOptions` object as input and returns the data in CSV formated string, which can then be saved or further processed.
+
+```csharp
+//Create an instance of SuppressionsExportOptions
+var exportOptions = new SuppressionsExportOptions.Builder()
+                .SetFrom(DateTime.Now.AddYears(-3))
+                .SetTo(DateTime.Now)
+                .Build();
+
+//Create a new instance of TurboSMTPClient
+var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+
+//Export Suppressions
+var csvContent = await client.Suppressions.Export(exportOptions);
+
+//Save content to a CSV File.
+File.WriteAllText(filePath, csvContent);
+```
+
+## Delete a Single Suppression
+
+The **Delete** method is an asynchronous operation that handles the process of removing an email address from the suppressions list. The method takes the *email address to remove from the suppressions list* as input and returns a boolean result that indicates if the deletion was successful.
+
+```csharp
+var suppressionEmailAddress = "recipient@recipient.domain.com";
+
+//Create a new instance of TurboSMTPClient
+var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+
+//Remove Suppression
+var success = await client.Suppressions.Delete(suppressionEmailAddress);
+
+//Evaluate if the Suppression was Successfully Removed.
+if (success)
+{
+    Console.WriteLine("Removed");
+}
+```

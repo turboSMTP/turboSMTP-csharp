@@ -43,16 +43,6 @@ namespace TurboSMTP.Services
             return await AddRange(reason, new List<string> { emailAddress });
         }
 
-
-        private PagedListResults<Suppression> GetPagedListResults(SuppressionsSucessResponsetBody response)
-        {
-            return new PagedListResults<Suppression>()
-            {
-                TotalRecords = response.Count,
-                Records = response.Results.Select(r => new Suppression(r.Date, r.Sender, (SuppresionSource)r.Source, r.Subject, r.Recipient, r.Reason)).ToList()
-            };
-        }
-
         public async Task<PagedListResults<Suppression>> Query(SuppressionsQueryOptions options)
         {
             var suppressionFilterOrderPageRequestBody = new SuppressionFilterOrderPageRequestBody(options.From, options.To) {
@@ -72,7 +62,12 @@ namespace TurboSMTP.Services
                 )).ToList() : null
             };
             var response = await API.FilterSuppressionsAsync(suppressionFilterOrderPageRequestBody);
-            return GetPagedListResults(response);
+
+            return new PagedListResults<Suppression>()
+            {
+                TotalRecords = response.Count,
+                Records = response.Results.Select(r => new Suppression(r.Date, r.Sender, (SuppresionSource)r.Source, r.Subject, r.Recipient, r.Reason)).ToList()
+            };
         }
 
         public async Task<string> Export(SuppressionsExportOptions options)
