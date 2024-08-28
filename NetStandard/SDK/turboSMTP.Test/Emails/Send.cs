@@ -28,7 +28,7 @@ namespace TurboSMTP.Test.Emails
             //Act
             try
             {
-                var result = await TS.Emails.Send(emailMessage);
+                var result = await TS.Emails.SendAsync(emailMessage);
                 //Assert
                 Assert.That(result.Message == "OK");
                 Assert.That(result.MessageID > 0);
@@ -69,7 +69,7 @@ namespace TurboSMTP.Test.Emails
             //Act
             try
             {
-                var result = await TS.Emails.Send(emailMessage);
+                var result = await TS.Emails.SendAsync(emailMessage);
                 //Assert
                 Assert.That(result.Message == "OK");
                 Assert.That(result.MessageID > 0);
@@ -114,7 +114,7 @@ namespace TurboSMTP.Test.Emails
             //Act
             try
             {
-                var result = await TS.Emails.Send(emailMessage);
+                var result = await TS.Emails.SendAsync(emailMessage);
                 //Assert
                 Assert.That(result.Message == "OK");
                 Assert.That(result.MessageID > 0);

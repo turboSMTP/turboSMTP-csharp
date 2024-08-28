@@ -237,3 +237,70 @@ if (success)
     Console.WriteLine("Removed");
 }
 ```
+
+## Delete Multiple Suppressions
+
+The **DeleteRange** method is an asynchronous operation that handles the process of removing multiple email addresses from the suppressions list. The method takes a list of *email addresses to remove from the suppresions list* as input and returns a boolean result, that indicates if the deletion was successful.
+
+```csharp
+var testEmailAddresses = new List<string>()
+            {
+                "first-recipient@recipient.domain.com",
+                "second-recipient@recipient.domain.com",
+                "third-recipient@recipient.domain.com",
+            };
+
+//Create a new instance of TurboSMTPClient
+var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+
+//Remove Suppressions
+var success = await client.Suppressions.DeleteRange(testEmailAddresses);
+
+//Evaluate if the suppressions were Successfully Removed.
+if (success)
+{
+    Console.WriteLine("Removed");
+}
+```
+
+## Delete Suppressions Based on a Criteria
+
+The **Delete** method is an asynchronous operation that handles the process of removing multiple email addresses from the suppressions list according to a filter Criteria. The method takes a `SuppressionsDeleteOptions` object as input and returns a boolean result, that indicates if the deletion was successful.
+
+```csharp
+//Create an instance of SuppressionsDeleteOptions
+var deleteOptions = new SuppressionsDeleteOptions.Builder()
+                .SetFrom(DateTime.Now.AddMonths(-1))
+                .SetTo(DateTime.Now)
+                .Build();
+
+//Create a new instance of TurboSMTPClient
+var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+
+//Remove Suppressions
+var success = await client.Suppressions.Delete(deleteOptions);
+
+//Evaluate if the suppressions were Successfully Removed.
+if (success)
+{
+    Console.WriteLine("Removed");
+}
+```
+
+# Email Validator
+
+## Get Email Validator Subscription.
+
+The **GetEmailValidatorSubscription** method is an asynchronous operation that handles the process of retrieving Email Validator Subsctiption details. The method  returns an `EmailValidatorSubscription` object.
+
+```csharp
+//Create a new instance of TurboSMTPClient
+var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+
+//Retrieve Email Validator Subscription
+var emailValidatorSubscription = await client.EmailValidator.GetEmailValidatorSubscription();
+
+//Evaluate remaining credits.
+Console.WriteLine($"Free Credits: {emailValidatorSubscription.FreeCredits}");
+Console.WriteLine($"Paid Credits: {emailValidatorSubscription.PaidCredits}");
+```

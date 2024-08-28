@@ -24,7 +24,7 @@ namespace TurboSMTP.Services
             API = new MailApi(configuration);
         }
 
-        public async Task<SendDetails> Send(EmailMessage email)
+        public async Task<SendDetails> SendAsync(EmailMessage email)
         {
             var emailRequest = new EmailRequestBody()
             {
