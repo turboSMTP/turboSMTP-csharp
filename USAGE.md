@@ -304,3 +304,67 @@ var emailValidatorSubscription = await client.EmailValidator.GetEmailValidatorSu
 Console.WriteLine($"Free Credits: {emailValidatorSubscription.FreeCredits}");
 Console.WriteLine($"Paid Credits: {emailValidatorSubscription.PaidCredits}");
 ```
+
+## Validate a Single Email Address.
+
+The **Validate** method is an asynchronous operation that handles the process of validating an email address. The method takes the *email address to validate* as input and returns an `EmailAddressValidationDetails` object.
+
+```csharp
+//Create a new instance of TurboSMTPClient
+var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+
+//Retrieve Email Address Validation Details
+var emailAddressValidationDetails = await client.emailValidator.Validate("recipient@recipient-domain.com");
+
+//Evaluate Email Address Validation Details
+Console.WriteLine($"Status: {emailAddressValidationDetails.Status} - {emailAddressValidationDetails.SubStatus}");
+Console.WriteLine($"Free: {emailAddressValidationDetails.FreeEmail}");
+```
+
+# Email Validator Files
+
+## Add a File of Email Addresses
+
+The **Add** method is an asynchronous operation that handles the process of adding a list of email addresses. The method takes the *filename* and a list of *email addresses* as input and returns the id of the list just added.
+
+```csharp
+//Create a new instance of TurboSMTPClient
+var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+
+//Create a sample list of email addresses.
+var contactsDetails = new List<string>()
+    {
+        "recipient1@domain.com",
+        "recipient2@domain.com"
+    };
+
+//Add a file named "contacts.txt" with the list of email addresses
+var fileId = await client.EmailValidatorFiles.Add("contacts.txt", contactsDetails);
+```
+
+## Query Files
+
+The **Query** method is an asynchronous operation designed to retrieve paginated results of files data based on specified query options. The method takes an `EmailValidatorFilesQueryOptions` object as input and returns PagedListResults<EmailValidatorFile> object, which contains the total number of records and a list of EmailValidatorFile objects.
+
+```csharp
+//Create an instance of EmailValidatorFilesQueryOptions
+var queryOptions = new EmailValidatorFilesQueryOptions.Builder()
+    .SetFrom(DateTime.Now.AddYears(-3))
+    .SetTo(DateTime.Now)
+    .Build();
+
+//Create a new instance of TurboSMTPClient
+var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+
+//Query Email Validator Files
+var pagedList = await client.EmailValidatorFiles.Query(queryOptions);
+
+//Evaluate the total ammount of records according to the queryOptions.
+Console.WriteLine(pagedList.TotalRecords);
+
+//Evaluate the Recipient of the fist Suppression.
+foreach (var file in pagedList.Records) 
+{
+    Console.WriteLine($"File: {file.FileName} - Processed: {file.IsProcessed}");
+}
+```
