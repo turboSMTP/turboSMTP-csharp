@@ -383,3 +383,36 @@ foreach (var file in pagedList.Records)
     Console.WriteLine($"File: {file.FileName} - Processed: {file.IsProcessed}");
 }
 ```
+
+## Validate a File
+
+The **Validate** method is an asynchronous operation designed to validate (process) a file based on a specific file identifier. The method takes the *id* as input and returns a boolean indicating if validation was sucessfull or not.
+
+```csharp
+//Create a new instance of TurboSMTPClient
+var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+
+//Validate file
+var validationResult = await client.EmailValidatorFiles.Validate(fileId);
+
+//Evaluate the validation result.
+if (validationResult)
+    Console.WriteLine("Validation OK");
+```
+
+## Delete a File
+
+The **Delete** method is an asynchronous operation designed to delete a file based on a specific file identifier. The method takes the *id* as input and returns a boolean indicating if validation was sucessfull or not.
+
+```csharp
+//Create a new instance of TurboSMTPClient
+var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+
+//Delete a file
+var deleteResult = await client.EmailValidatorFiles.Delete(fileId);
+
+//Evaluate the delete result.
+if (deleteResult)
+  Console.WriteLine("File has been deleted.");
+```
+
