@@ -342,7 +342,22 @@ var contactsDetails = new List<string>()
 var fileId = await client.EmailValidatorFiles.Add("contacts.txt", contactsDetails);
 ```
 
-## Query Files
+## Get Single File Details
+
+The **Get** method is an asynchronous operation designed to retrieve file data based on a specific file identifier. The method takes the *id* as input and returns an EmailValidatorFile object.
+
+```csharp
+//Create a new instance of TurboSMTPClient
+var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+
+//Get Email Validator File Details
+var emailValidatorFile = await client.EmailValidatorFiles.Get(fileId);
+
+//Evaluate the File Details.
+Console.WriteLine($"File: {emailValidatorFile.FileName} - Processed: {emailValidatorFile.IsProcessed}");
+```
+
+## Query Files Details
 
 The **Query** method is an asynchronous operation designed to retrieve paginated results of files data based on specified query options. The method takes an `EmailValidatorFilesQueryOptions` object as input and returns PagedListResults<EmailValidatorFile> object, which contains the total number of records and a list of EmailValidatorFile objects.
 
@@ -362,7 +377,7 @@ var pagedList = await client.EmailValidatorFiles.Query(queryOptions);
 //Evaluate the total ammount of records according to the queryOptions.
 Console.WriteLine(pagedList.TotalRecords);
 
-//Evaluate the Recipient of the fist Suppression.
+//Evaluate Processing Status of all returened files.
 foreach (var file in pagedList.Records) 
 {
     Console.WriteLine($"File: {file.FileName} - Processed: {file.IsProcessed}");
