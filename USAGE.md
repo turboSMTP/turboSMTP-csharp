@@ -314,7 +314,7 @@ The **Validate** method is an asynchronous operation that handles the process of
 var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
 
 //Retrieve Email Address Validation Details
-var emailAddressValidationDetails = await client.emailValidator.Validate("recipient@recipient-domain.com");
+var emailAddressValidationDetails = await client.EmailValidator.Validate("recipient@recipient-domain.com");
 
 //Evaluate Email Address Validation Details
 Console.WriteLine($"Status: {emailAddressValidationDetails.Status} - {emailAddressValidationDetails.SubStatus}");
@@ -416,3 +416,40 @@ if (deleteResult)
   Console.WriteLine("File has been deleted.");
 ```
 
+# Email Validator File Results
+
+## Query File Validation Results
+
+The **Query** method is an asynchronous operation designed to retrieve paginated results of validation results data based on specified query options. The method takes an `EmailValidatorFileResultsQueryOptions` object as input and returns PagedListResults<EmailAddressValidationDetails> object, which contains the total number of records and a list of EmailAddressValidationDetails objects.
+
+```csharp
+//Create a new instance of TurboSMTPClient
+var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+
+//Query file results
+var pagedList = await client.EmailValidatorFileResults.Query(queryOptions);
+
+//Evaluate the total ammount of records according to the queryOptions.
+Console.WriteLine(pagedList.TotalRecords);
+
+//Evaluate Processing Status of all returened files.
+foreach (var emailAddressValidationDetails in pagedList.Records)
+{
+    Console.WriteLine($"Email: {emailAddressValidationDetails.Email} - Status: {emailAddressValidationDetails.Status}");
+}
+```
+
+## Export File Validation Results To CSV
+
+The **Export** method is an asynchronous operation designed to export file validation results based on specified export options. The method takes the *id* as input as input and returns the data in CSV formated string, which can then be saved or further processed.
+
+```csharp
+//Create a new instance of TurboSMTPClient
+var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
+
+//Export file results
+var csvContent = await client.EmailValidatorFileResults.Export(fileId);
+
+//Save content to a CSV File.
+File.WriteAllText(filePath, csvContent);
+```
