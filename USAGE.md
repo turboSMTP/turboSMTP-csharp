@@ -50,7 +50,7 @@ var TSClient = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
 
 ## Send Email Messages
 
-The **Send** method is an asynchronous operation that handles the process of sending an email message. The method takes an `EmailMessage` object as input and returns a `SendDetails` object, which contains the result of the email sending operation.
+The **SendAsync** method is an asynchronous operation that handles the process of sending an email message. The method takes an `EmailMessage` object as input and returns a `SendDetails` object, which contains the result of the email sending operation.
 
 ```csharp
 //Create an instance of EmailMessage
@@ -65,7 +65,7 @@ var emailMessage = new EmailMessage.Builder()
 var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
 
 //Send the email message
-var sendResult = await client.Emails.Send(emailMessage);
+var sendResult = await client.Emails.SendAsync(emailMessage);
 
 //Evaluate the MessageID assigned to the sent message            
 Console.WriteLine(sendResult.MessageID);
@@ -75,7 +75,7 @@ Console.WriteLine(sendResult.MessageID);
 
 ## Query Relays Details
 
-The **Query** method is an asynchronous operation designed to retrieve paginated results of relay data based on specified query options. The method takes a `RelaysQueryOptions` object as input and returns PagedListResults<Relay> object, which contains the total number of records and a list of Relay objects.
+The **QueryAsync** method is an asynchronous operation designed to retrieve paginated results of relay data based on specified query options. The method takes a `RelaysQueryOptions` object as input and returns PagedListResults<Relay> object, which contains the total number of records and a list of Relay objects.
 
 ```csharp
 //Create an instance of RealysQueryOptions
@@ -88,7 +88,7 @@ var queryOptions = new RelaysQueryOptions.Builder()
 var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
 
 //Query Relays
-var pagedList = await client.Relays.Query(queryOptions);
+var pagedList = await client.Relays.QueryAsync(queryOptions);
 
 //Evaluate the total ammount of records according to the queryOptions.
 Console.WriteLine(pagedList.TotalRecords);
@@ -99,7 +99,7 @@ Console.WriteLine(pagedList.Records.First().Subject);
 
 ## Export Relays Details To CSV
 
-The **Export** method is an asynchronous operation designed to export relay data based on specified export options. The method takes a `RelaysExportOptions` object as input  and returns the data in CSV formated string, which can then be saved or further processed.
+The **ExportAsync** method is an asynchronous operation designed to export relay data based on specified export options. The method takes a `RelaysExportOptions` object as input  and returns the data in CSV formated string, which can then be saved or further processed.
 
 ```csharp
 //Create an instance of RealysExportOptions
@@ -112,7 +112,7 @@ var exportOptions = new RelaysExportOptions.Builder()
 var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
 
 //Export Relays
-var csvContent = await client.Relays.Export(exportOptions);
+var csvContent = await client.Relays.ExportAsync(exportOptions);
 
 //Save content to a CSV File.
 File.WriteAllText(filePath, csvContent);
@@ -122,7 +122,7 @@ File.WriteAllText(filePath, csvContent);
 
 ## Add a Single Suppression
 
-The **Add** method is an asynchronous operation that handles the process of adding an email address to the suppressions list. The method takes the *reason for the suppression* and the *email address to add to the suppresions list* as input and returns a `SuppressionsAddResult` object, which contains the result of the Add operation.
+The **AddAsync** method is an asynchronous operation that handles the process of adding an email address to the suppressions list. The method takes the *reason for the suppression* and the *email address to add to the suppresions list* as input and returns a `SuppressionsAddResult` object, which contains the result of the Add operation.
 
 ```csharp
 var suppressionReason = "Manual Processing of Removal Request";
@@ -132,7 +132,7 @@ var suppressionEmailAddress = "recipient@recipient.domain.com";
 var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
 
 //Add the Email Address to the Suppressions List.
-var addSuppressionsResult = await client.Suppressions.Add(suppressionReason,suppressionEmailAddress);
+var addSuppressionsResult = await client.Suppressions.AddAsync(suppressionReason,suppressionEmailAddress);
 
 //Evaluate if the Suppression was Successfully Processed.
 if (addSuppressionsResult.Valid.Contains(suppressionEmailAddress))
@@ -143,7 +143,7 @@ if (addSuppressionsResult.Valid.Contains(suppressionEmailAddress))
 
 ## Add Multiple Suppressions
 
-The **AddRange** method is an asynchronous operation that handles the process of adding multiple email addresses to the suppressions list. The method takes the *reason for the suppressions* and a list of *email addresses to add to the suppresions list* as input and returns a `SuppressionsAddResult` object, which contains the result of the AddRange operation.
+The **AddRangeAsync** method is an asynchronous operation that handles the process of adding multiple email addresses to the suppressions list. The method takes the *reason for the suppressions* and a list of *email addresses to add to the suppresions list* as input and returns a `SuppressionsAddResult` object, which contains the result of the AddRange operation.
 
 ```csharp
 var suppressionReason = "Manual Processing of Removal Request";
@@ -160,7 +160,7 @@ var testEmailAddresses = new List<string>()
 var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
 
 //Add the Test Mail Addresses to the Suppressions List
-var addSuppressionsResult = await client.Suppressions.AddRange(suppressionReason, testEmailAddresses);
+var addSuppressionsResult = await client.Suppressions.AddRangeAsync(suppressionReason, testEmailAddresses);
 
 //Evaluate Suppressions Processing Result
 foreach (var validEmailAddress in addSuppressionsResult.Valid)
@@ -175,7 +175,7 @@ foreach (var inValidEmailAddress in addSuppressionsResult.Invalid)
 
 ## Query Suppressions
 
-The **Query** method is an asynchronous operation designed to retrieve paginated results of suppressions data based on specified query options. The method takes a `SuppressionsQueryOptions` object as input and returns PagedListResults<Suppression> object, which contains the total number of records and a list of Suppresion objects.
+The **QueryAsync** method is an asynchronous operation designed to retrieve paginated results of suppressions data based on specified query options. The method takes a `SuppressionsQueryOptions` object as input and returns PagedListResults<Suppression> object, which contains the total number of records and a list of Suppresion objects.
 
 ```csharp
 //Create an instance of SuppressionsQueryOptions
@@ -188,7 +188,7 @@ var queryOptions = new SuppressionsQueryOptions.Builder()
 var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
 
 //Query Suppressions
-var pagedList = await client.Suppressions.Query(queryOptions);
+var pagedList = await client.Suppressions.QueryAsync(queryOptions);
 
 //Evaluate the total ammount of records according to the queryOptions.
 Console.WriteLine(pagedList.TotalRecords);
@@ -199,7 +199,7 @@ Console.WriteLine(pagedList.Records.First().Recipient);
 
 ## Export Suppressions To CSV
 
-The **Export** method is an asynchronous operation designed to export suppressions data based on specified export options. The method takes a `SuppressionsExportOptions` object as input and returns the data in CSV formated string, which can then be saved or further processed.
+The **ExportAsync** method is an asynchronous operation designed to export suppressions data based on specified export options. The method takes a `SuppressionsExportOptions` object as input and returns the data in CSV formated string, which can then be saved or further processed.
 
 ```csharp
 //Create an instance of SuppressionsExportOptions
@@ -212,7 +212,7 @@ var exportOptions = new SuppressionsExportOptions.Builder()
 var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
 
 //Export Suppressions
-var csvContent = await client.Suppressions.Export(exportOptions);
+var csvContent = await client.Suppressions.ExportAsync(exportOptions);
 
 //Save content to a CSV File.
 File.WriteAllText(filePath, csvContent);
@@ -220,7 +220,7 @@ File.WriteAllText(filePath, csvContent);
 
 ## Delete a Single Suppression
 
-The **Delete** method is an asynchronous operation that handles the process of removing an email address from the suppressions list. The method takes the *email address to remove from the suppressions list* as input and returns a boolean result that indicates if the deletion was successful.
+The **DeleteAsync** method is an asynchronous operation that handles the process of removing an email address from the suppressions list. The method takes the *email address to remove from the suppressions list* as input and returns a boolean result that indicates if the deletion was successful.
 
 ```csharp
 var suppressionEmailAddress = "recipient@recipient.domain.com";
@@ -229,7 +229,7 @@ var suppressionEmailAddress = "recipient@recipient.domain.com";
 var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
 
 //Remove Suppression
-var success = await client.Suppressions.Delete(suppressionEmailAddress);
+var success = await client.Suppressions.DeleteAsync(suppressionEmailAddress);
 
 //Evaluate if the Suppression was Successfully Removed.
 if (success)
@@ -240,7 +240,7 @@ if (success)
 
 ## Delete Multiple Suppressions
 
-The **DeleteRange** method is an asynchronous operation that handles the process of removing multiple email addresses from the suppressions list. The method takes a list of *email addresses to remove from the suppresions list* as input and returns a boolean result, that indicates if the deletion was successful.
+The **DeleteRangeAsync** method is an asynchronous operation that handles the process of removing multiple email addresses from the suppressions list. The method takes a list of *email addresses to remove from the suppresions list* as input and returns a boolean result, that indicates if the deletion was successful.
 
 ```csharp
 var testEmailAddresses = new List<string>()
@@ -254,7 +254,7 @@ var testEmailAddresses = new List<string>()
 var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
 
 //Remove Suppressions
-var success = await client.Suppressions.DeleteRange(testEmailAddresses);
+var success = await client.Suppressions.DeleteRangeAsync(testEmailAddresses);
 
 //Evaluate if the suppressions were Successfully Removed.
 if (success)
@@ -265,7 +265,7 @@ if (success)
 
 ## Delete Suppressions Based on a Criteria
 
-The **Delete** method is an asynchronous operation that handles the process of removing multiple email addresses from the suppressions list according to a filter Criteria. The method takes a `SuppressionsDeleteOptions` object as input and returns a boolean result, that indicates if the deletion was successful.
+The **DeleteAsync** method is an asynchronous operation that handles the process of removing multiple email addresses from the suppressions list according to a filter Criteria. The method takes a `SuppressionsDeleteOptions` object as input and returns a boolean result, that indicates if the deletion was successful.
 
 ```csharp
 //Create an instance of SuppressionsDeleteOptions
@@ -278,7 +278,7 @@ var deleteOptions = new SuppressionsDeleteOptions.Builder()
 var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
 
 //Remove Suppressions
-var success = await client.Suppressions.Delete(deleteOptions);
+var success = await client.Suppressions.DeleteAsync(deleteOptions);
 
 //Evaluate if the suppressions were Successfully Removed.
 if (success)
@@ -291,14 +291,14 @@ if (success)
 
 ## Get Email Validator Subscription.
 
-The **GetEmailValidatorSubscription** method is an asynchronous operation that handles the process of retrieving Email Validator Subsctiption details. The method  returns an `EmailValidatorSubscription` object.
+The **GetEmailValidatorSubscriptionAsync** method is an asynchronous operation that handles the process of retrieving Email Validator Subsctiption details. The method  returns an `EmailValidatorSubscription` object.
 
 ```csharp
 //Create a new instance of TurboSMTPClient
 var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
 
 //Retrieve Email Validator Subscription
-var emailValidatorSubscription = await client.EmailValidator.GetEmailValidatorSubscription();
+var emailValidatorSubscription = await client.EmailValidator.GetEmailValidatorSubscriptionAsync();
 
 //Evaluate remaining credits.
 Console.WriteLine($"Free Credits: {emailValidatorSubscription.FreeCredits}");
@@ -307,14 +307,14 @@ Console.WriteLine($"Paid Credits: {emailValidatorSubscription.PaidCredits}");
 
 ## Validate a Single Email Address.
 
-The **Validate** method is an asynchronous operation that handles the process of validating an email address. The method takes the *email address to validate* as input and returns an `EmailAddressValidationDetails` object.
+The **ValidateAsync** method is an asynchronous operation that handles the process of validating an email address. The method takes the *email address to validate* as input and returns an `EmailAddressValidationDetails` object.
 
 ```csharp
 //Create a new instance of TurboSMTPClient
 var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
 
 //Retrieve Email Address Validation Details
-var emailAddressValidationDetails = await client.EmailValidator.Validate("recipient@recipient-domain.com");
+var emailAddressValidationDetails = await client.EmailValidator.ValidateAsync("recipient@recipient-domain.com");
 
 //Evaluate Email Address Validation Details
 Console.WriteLine($"Status: {emailAddressValidationDetails.Status} - {emailAddressValidationDetails.SubStatus}");
@@ -325,7 +325,7 @@ Console.WriteLine($"Free: {emailAddressValidationDetails.FreeEmail}");
 
 ## Add a File of Email Addresses
 
-The **Add** method is an asynchronous operation that handles the process of adding a list of email addresses. The method takes the *filename* and a list of *email addresses* as input and returns the id of the list just added.
+The **AddAsync** method is an asynchronous operation that handles the process of adding a list of email addresses. The method takes the *filename* and a list of *email addresses* as input and returns the id of the list just added.
 
 ```csharp
 //Create a new instance of TurboSMTPClient
@@ -339,19 +339,19 @@ var contactsDetails = new List<string>()
     };
 
 //Add a file named "contacts.txt" with the list of email addresses
-var fileId = await client.EmailValidatorFiles.Add("contacts.txt", contactsDetails);
+var fileId = await client.EmailValidatorFiles.AddAsync("contacts.txt", contactsDetails);
 ```
 
 ## Get Single File Details
 
-The **Get** method is an asynchronous operation designed to retrieve file data based on a specific file identifier. The method takes the *id* as input and returns an EmailValidatorFile object.
+The **GetAsync** method is an asynchronous operation designed to retrieve file data based on a specific file identifier. The method takes the *id* as input and returns an EmailValidatorFile object.
 
 ```csharp
 //Create a new instance of TurboSMTPClient
 var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
 
 //Get Email Validator File Details
-var emailValidatorFile = await client.EmailValidatorFiles.Get(fileId);
+var emailValidatorFile = await client.EmailValidatorFiles.GetAsync(fileId);
 
 //Evaluate the File Details.
 Console.WriteLine($"File: {emailValidatorFile.FileName} - Processed: {emailValidatorFile.IsProcessed}");
@@ -359,7 +359,7 @@ Console.WriteLine($"File: {emailValidatorFile.FileName} - Processed: {emailValid
 
 ## Query Files Details
 
-The **Query** method is an asynchronous operation designed to retrieve paginated results of files data based on specified query options. The method takes an `EmailValidatorFilesQueryOptions` object as input and returns PagedListResults<EmailValidatorFile> object, which contains the total number of records and a list of EmailValidatorFile objects.
+The **QueryAsync** method is an asynchronous operation designed to retrieve paginated results of files data based on specified query options. The method takes an `EmailValidatorFilesQueryOptions` object as input and returns PagedListResults<EmailValidatorFile> object, which contains the total number of records and a list of EmailValidatorFile objects.
 
 ```csharp
 //Create an instance of EmailValidatorFilesQueryOptions
@@ -372,7 +372,7 @@ var queryOptions = new EmailValidatorFilesQueryOptions.Builder()
 var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
 
 //Query Email Validator Files
-var pagedList = await client.EmailValidatorFiles.Query(queryOptions);
+var pagedList = await client.EmailValidatorFiles.QueryAsync(queryOptions);
 
 //Evaluate the total ammount of records according to the queryOptions.
 Console.WriteLine(pagedList.TotalRecords);
@@ -386,14 +386,14 @@ foreach (var file in pagedList.Records)
 
 ## Validate a File
 
-The **Validate** method is an asynchronous operation designed to validate (process) a file based on a specific file identifier. The method takes the *id* as input and returns a boolean indicating if validation was sucessfull or not.
+The **ValidateAsync** method is an asynchronous operation designed to validate (process) a file based on a specific file identifier. The method takes the *id* as input and returns a boolean indicating if validation was sucessfull or not.
 
 ```csharp
 //Create a new instance of TurboSMTPClient
 var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
 
 //Validate file
-var validationResult = await client.EmailValidatorFiles.Validate(fileId);
+var validationResult = await client.EmailValidatorFiles.ValidateAsync(fileId);
 
 //Evaluate the validation result.
 if (validationResult)
@@ -402,14 +402,14 @@ if (validationResult)
 
 ## Delete a File
 
-The **Delete** method is an asynchronous operation designed to delete a file based on a specific file identifier. The method takes the *id* as input and returns a boolean indicating if validation was sucessfull or not.
+The **DeleteAsync** method is an asynchronous operation designed to delete a file based on a specific file identifier. The method takes the *id* as input and returns a boolean indicating if validation was sucessfull or not.
 
 ```csharp
 //Create a new instance of TurboSMTPClient
 var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
 
 //Delete a file
-var deleteResult = await client.EmailValidatorFiles.Delete(fileId);
+var deleteResult = await client.EmailValidatorFiles.DeleteAsync(fileId);
 
 //Evaluate the delete result.
 if (deleteResult)
@@ -420,14 +420,14 @@ if (deleteResult)
 
 ## Query File Validation Results
 
-The **Query** method is an asynchronous operation designed to retrieve paginated results of validation results data based on specified query options. The method takes an `EmailValidatorFileResultsQueryOptions` object as input and returns PagedListResults<EmailAddressValidationDetails> object, which contains the total number of records and a list of EmailAddressValidationDetails objects.
+The **QueryAsync** method is an asynchronous operation designed to retrieve paginated results of validation results data based on specified query options. The method takes an `EmailValidatorFileResultsQueryOptions` object as input and returns PagedListResults<EmailAddressValidationDetails> object, which contains the total number of records and a list of EmailAddressValidationDetails objects.
 
 ```csharp
 //Create a new instance of TurboSMTPClient
 var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
 
 //Query file results
-var pagedList = await client.EmailValidatorFileResults.Query(queryOptions);
+var pagedList = await client.EmailValidatorFileResults.QueryAsync(queryOptions);
 
 //Evaluate the total ammount of records according to the queryOptions.
 Console.WriteLine(pagedList.TotalRecords);
@@ -448,7 +448,7 @@ The **Export** method is an asynchronous operation designed to export file valid
 var client = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
 
 //Export file results
-var csvContent = await client.EmailValidatorFileResults.Export(fileId);
+var csvContent = await client.EmailValidatorFileResults.ExportAsync(fileId);
 
 //Save content to a CSV File.
 File.WriteAllText(filePath, csvContent);

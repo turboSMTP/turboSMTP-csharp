@@ -17,7 +17,7 @@ namespace turboSMTP.Test.EmailValidator.EmailValidatorFiles
             //Act
             try
             {
-                var result = await TS.EmailValidatorFiles.Delete(0);
+                var result = await TS.EmailValidatorFiles.DeleteAsync(0);
                 //Assert
                 Assert.That(!result);
             }
@@ -37,12 +37,12 @@ namespace turboSMTP.Test.EmailValidator.EmailValidatorFiles
             //Act
             try
             {
-                fileId = await TS.EmailValidatorFiles.Add(
+                fileId = await TS.EmailValidatorFiles.AddAsync(
                      $"{GetFormatedDateTimeCompressed()}-EmailvalidatorFile.txt",
                      AppConstants.InvalidEmailAddresses.GetRange(0, 2));
 
                 Assert.That(fileId > 0);
-                var result = await TS.EmailValidatorFiles.Delete(fileId);
+                var result = await TS.EmailValidatorFiles.DeleteAsync(fileId);
                 //Assert
                 Assert.That(result);
             }

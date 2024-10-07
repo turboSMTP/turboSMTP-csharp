@@ -11,7 +11,7 @@ namespace TurboSMTP.Services
     {
         public EmailValidator(Configuration configuration, string timeZone) : base(configuration,timeZone) {}
 
-        public async Task<EmailValidatorSubscription> GetEmailValidatorSubscription()
+        public async Task<EmailValidatorSubscription> GetEmailValidatorSubscriptionAsync()
         {
             var response = await API.GetEmailValidationSubscriptionAsync();
             return new EmailValidatorSubscription(
@@ -25,7 +25,7 @@ namespace TurboSMTP.Services
                 response.RemainingFreeCredit);
         }
 
-        public async Task<EmailAddressValidationDetails> Validate(string email)
+        public async Task<EmailAddressValidationDetails> ValidateAsync(string email)
         {
             try
             {

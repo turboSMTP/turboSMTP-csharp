@@ -26,7 +26,7 @@ namespace TurboSMTP.Test.Suppressions
             //Act
             try
             {
-                var result = await TS.Suppressions.AddRange("Adding Multiple - {GetFormatedDateTime()}",emailAddressesToAdd);
+                var result = await TS.Suppressions.AddRangeAsync("Adding Multiple - {GetFormatedDateTime()}",emailAddressesToAdd);
                 //Assert
                 Assert.That(result.Valid.Count == 3);
                 Assert.That(result.Invalid.Count == 2);
@@ -52,7 +52,7 @@ namespace TurboSMTP.Test.Suppressions
             //Act
             try
             {
-                var result = await TS.Suppressions.Add($"Adding Single - {GetFormatedDateTime()}", emailAddressToAdd);
+                var result = await TS.Suppressions.AddAsync($"Adding Single - {GetFormatedDateTime()}", emailAddressToAdd);
                 
                 //Assert
                 Assert.That(result.Valid.Count == 1);
@@ -77,7 +77,7 @@ namespace TurboSMTP.Test.Suppressions
             //Act
             try
             {
-                var result = await TS.Suppressions.Add($"Adding Invalid - {GetFormatedDateTime()}", emailAddressToAdd);
+                var result = await TS.Suppressions.AddAsync($"Adding Invalid - {GetFormatedDateTime()}", emailAddressToAdd);
                 
                 //Assert
                 Assert.That(result.Valid.Count == 0);

@@ -22,7 +22,7 @@ namespace TurboSMTP.Test.Suppressions
             //Act
             try
             {
-                var result = await TS.Suppressions.Export(exportOptions);
+                var result = await TS.Suppressions.ExportAsync(exportOptions);
                 
                 //Assert
                 Assert.That(result.Length>0);
@@ -58,7 +58,7 @@ namespace TurboSMTP.Test.Suppressions
                 .Build();
 
             //Act
-            var result = await TS.Suppressions.Export(exportOptions);
+            var result = await TS.Suppressions.ExportAsync(exportOptions);
             //Assert
             Assert.That(result.Length > 0);
             Assert.That(result.Contains(restrictions[0].Filter));

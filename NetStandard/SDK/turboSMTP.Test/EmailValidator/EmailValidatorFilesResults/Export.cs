@@ -19,7 +19,7 @@ namespace turboSMTP.Test.EmailValidator.EmailValidatorFilesResults
             //Act
             try
             {
-                var fileId = await TS.EmailValidatorFiles.Add(
+                var fileId = await TS.EmailValidatorFiles.AddAsync(
                     $"{GetFormatedDateTimeCompressed()}-EmailvalidatorFile.txt",
                     AppConstants.ValidEmailAddresses.GetRange(0, 2));
 
@@ -29,14 +29,14 @@ namespace turboSMTP.Test.EmailValidator.EmailValidatorFilesResults
 
                 //Assert
                 Assert.That(fileId > 0, "Generated Test File Id should be greater than zero");
-                var result = await TS.EmailValidatorFileResults.Query(options);
+                var result = await TS.EmailValidatorFileResults.QueryAsync(options);
                 
                 //Assert
                 Assert.That(result != null, "File Details results should not be null");
                 Assert.That(result.Records.Count == 0, "File Details should not have processed emails until validated");
                 
-                await TS.EmailValidatorFiles.Validate(fileId);
-                var stringResult = await TS.EmailValidatorFileResults.Export(fileId);
+                await TS.EmailValidatorFiles.ValidateAsync(fileId);
+                var stringResult = await TS.EmailValidatorFileResults.ExportAsync(fileId);
                 Assert.That(!string.IsNullOrEmpty(stringResult), "File Details result should not be null after validation");
                 Assert.That(stringResult.Contains(AppConstants.ValidEmailAddresses.First()), "After validating a File it should contain the address added to validate");
             }

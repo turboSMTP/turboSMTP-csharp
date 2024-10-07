@@ -22,7 +22,7 @@ namespace TurboSMTP.Test.Relays
             //Act
             try
             {
-                var result = await TS.Relays.Export(queryOptions);
+                var result = await TS.Relays.ExportAsync(queryOptions);
                 //Assert
                 Assert.That(result.Length>0);
             }
@@ -47,7 +47,7 @@ namespace TurboSMTP.Test.Relays
                 .Build();
 
             //Act
-            var result = await TS.Relays.Export(queryOptions);
+            var result = await TS.Relays.ExportAsync(queryOptions);
             
             //Assert
             Assert.That(result.Length > 0);

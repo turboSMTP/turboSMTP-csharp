@@ -28,7 +28,7 @@ namespace TurboSMTP.Services
             this.TimeZone = timeZone;
         }
 
-        public async Task<SuppressionsAddResult> AddRange(String reason, List<string> emailAddresses)
+        public async Task<SuppressionsAddResult> AddRangeAsync(String reason, List<string> emailAddresses)
         {
             var result = await API.ImportSuppressionsAsync(new SuppressionImportJson(SuppressionImportJson.TypeEnum.Manual, reason, emailAddresses));
 
@@ -38,12 +38,12 @@ namespace TurboSMTP.Services
                 result.Invalid
                 );
         }
-        public async Task<SuppressionsAddResult> Add(string reason, string emailAddress)
+        public async Task<SuppressionsAddResult> AddAsync(string reason, string emailAddress)
         {
-            return await AddRange(reason, new List<string> { emailAddress });
+            return await AddRangeAsync(reason, new List<string> { emailAddress });
         }
 
-        public async Task<PagedListResults<Suppression>> Query(SuppressionsQueryOptions options)
+        public async Task<PagedListResults<Suppression>> QueryAsync(SuppressionsQueryOptions options)
         {
             var suppressionFilterOrderPageRequestBody = new SuppressionFilterOrderPageRequestBody(options.From, options.To) {
                 Page = options.Page,
@@ -70,7 +70,7 @@ namespace TurboSMTP.Services
             };
         }
 
-        public async Task<string> Export(SuppressionsExportOptions options)
+        public async Task<string> ExportAsync(SuppressionsExportOptions options)
         {
             var response = await API.ExportFilterSuppressionsAsync(new SuppressionFilterRequestBody(options.From, options.To)
             {
@@ -90,20 +90,20 @@ namespace TurboSMTP.Services
         }
 
 
-        public async Task<bool> DeleteRange(List<string> emails)
+        public async Task<bool> DeleteRangeAsync(List<string> emails)
         {
             if (emails == null || emails.Count == 0)
                 return false;
             var resp = await API.BulkDeleteSuppressionsAsync(emails);
             return resp.Success;
         }
-        public async Task<bool> Delete(string email)
+        public async Task<bool> DeleteAsync(string email)
         {
             if (String.IsNullOrEmpty(email))
                 return false;
-            return await DeleteRange(new List<string>() { email });
+            return await DeleteRangeAsync(new List<string>() { email });
         }
-        public async Task<bool> Delete(SuppressionsDeleteOptions options)
+        public async Task<bool> DeleteAsync(SuppressionsDeleteOptions options)
         {
             var suppressionFilterRequestBody = new SuppressionFilterRequestBody(options.From, options.To)
             {

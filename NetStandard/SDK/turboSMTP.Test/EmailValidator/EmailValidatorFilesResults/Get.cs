@@ -18,7 +18,7 @@ namespace turboSMTP.Test.EmailValidator.EmailValidatorFilesResults
             //Act
             try
             {
-                var fileId = await TS.EmailValidatorFiles.Add(
+                var fileId = await TS.EmailValidatorFiles.AddAsync(
                     $"{GetFormatedDateTimeCompressed()}-EmailvalidatorFile.txt",
                     AppConstants.ValidEmailAddresses.GetRange(0, 2));
 
@@ -27,14 +27,14 @@ namespace turboSMTP.Test.EmailValidator.EmailValidatorFilesResults
                     .Build();
 
                 Assert.That(fileId > 0, "Generated Test File Id should be greater than zero");
-                var result = await TS.EmailValidatorFileResults.Query(options);
+                var result = await TS.EmailValidatorFileResults.QueryAsync(options);
                 
                 //Assert
                 Assert.That(result != null, "File Result Details should not be null");
                 Assert.That(result.Records.Count == 0, "File should not have processed emails until validated");
-                await TS.EmailValidatorFiles.Validate(fileId);
+                await TS.EmailValidatorFiles.ValidateAsync(fileId);
                 
-                result = await TS.EmailValidatorFileResults.Query(options);
+                result = await TS.EmailValidatorFileResults.QueryAsync(options);
                 Assert.That(result != null, "File Result Details should not be null after validation");
                 Assert.That(result.Records.Count == 2, "After validating a list it should contain the same ammount of results as items");
             }
@@ -55,7 +55,7 @@ namespace turboSMTP.Test.EmailValidator.EmailValidatorFilesResults
             //Act
             try
             {
-                var fileId = await TS.EmailValidatorFiles.Add(
+                var fileId = await TS.EmailValidatorFiles.AddAsync(
                     $"{GetFormatedDateTimeCompressed()}-EmailvalidatorFile.txt",
                     AppConstants.ValidEmailAddresses.GetRange(0, 2));
 
@@ -66,14 +66,14 @@ namespace turboSMTP.Test.EmailValidator.EmailValidatorFilesResults
                     .Build();
 
                 Assert.That(fileId > 0, "Generated Test File should be greater than zero");
-                var result = await TS.EmailValidatorFileResults.Query(options);
+                var result = await TS.EmailValidatorFileResults.QueryAsync(options);
                 
                 //Assert
                 Assert.That(result != null, "File Result Details should not be null");
                 Assert.That(result.Records.Count == 0, "File should not have processed emails until validated");
                 
-                await TS.EmailValidatorFiles.Validate(fileId);
-                result = await TS.EmailValidatorFileResults.Query(options);
+                await TS.EmailValidatorFiles.ValidateAsync(fileId);
+                result = await TS.EmailValidatorFileResults.QueryAsync(options);
                 Assert.That(result != null, "File Result Details should not be null after validation");
                 Assert.That(result.Records.Count == 1, "After validating a file, a paged list of 1 item per page it should contain 1 item");
                 Assert.That(result.Records.Count == 1, "2nd page should contain 1 email");

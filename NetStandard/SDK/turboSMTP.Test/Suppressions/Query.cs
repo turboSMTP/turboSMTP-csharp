@@ -23,7 +23,7 @@ namespace TurboSMTP.Test.Suppressions
             //Act
             try
             {
-                var result = await TS.Suppressions.Query(queryOptions);
+                var result = await TS.Suppressions.QueryAsync(queryOptions);
                 //Assert
                 Assert.That(result.Records.Count <= 10);
             }
@@ -47,7 +47,7 @@ namespace TurboSMTP.Test.Suppressions
                 .Build();
 
             //Act
-            var result = await TS.Suppressions.Query(queryOptions);
+            var result = await TS.Suppressions.QueryAsync(queryOptions);
             //Assert
             Assert.That(result.Records.Count <= queryOptions.Limit,$"Limit = {queryOptions.Limit} - Returned results = {result.TotalRecords}");
             Assert.Pass();
@@ -78,7 +78,7 @@ namespace TurboSMTP.Test.Suppressions
                 .Build();
 
             //Act
-            var result = await TS.Suppressions.Query(queryOptions);
+            var result = await TS.Suppressions.QueryAsync(queryOptions);
             //Assert
             Assert.That(result.Records.All(s => s.Subject.Contains(restrictions[0].Filter)));
             Assert.Pass();

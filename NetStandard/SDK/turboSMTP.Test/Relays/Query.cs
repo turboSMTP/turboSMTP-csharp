@@ -24,7 +24,7 @@ namespace TurboSMTP.Test.Relays
             //Act
             try
             {
-                var result = await TS.Relays.Query(queryOptions);
+                var result = await TS.Relays.QueryAsync(queryOptions);
                 //Assert
                 Assert.That(result.Records.Count <= 10);
             }
@@ -48,7 +48,7 @@ namespace TurboSMTP.Test.Relays
                 .Build();
             
             //Act
-            var result = await TS.Relays.Query(queryOptions);
+            var result = await TS.Relays.QueryAsync(queryOptions);
             
             //Assert
             Assert.That(result.Records.Count <= queryOptions.Limit,$"Limit = {queryOptions.Limit} - Returned results = {result.TotalRecords}");
@@ -70,7 +70,7 @@ namespace TurboSMTP.Test.Relays
                 .Build();
             
             //Act
-            var result = await TS.Relays.Query(queryOptions);
+            var result = await TS.Relays.QueryAsync(queryOptions);
             
             //Assert
             Assert.That(result.Records.All(s => s.Subject.Contains(queryOptions.Filter)));
@@ -98,7 +98,7 @@ namespace TurboSMTP.Test.Relays
                 .Build();
 
             //Act
-            var result = await TS.Relays.Query(queryOptions);
+            var result = await TS.Relays.QueryAsync(queryOptions);
 
             //Assert
             Assert.That(result.Records.All(s => s.Subject.Contains(queryOptions.Filter)));

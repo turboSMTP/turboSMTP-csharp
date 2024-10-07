@@ -22,7 +22,7 @@ namespace turboSMTP.Test.EmailValidator.EmailValidatorFiles
             //Act
             try
             {
-                var result = await TS.EmailValidatorFiles.Query(emailValidatorFilesQueryOptions);
+                var result = await TS.EmailValidatorFiles.QueryAsync(emailValidatorFilesQueryOptions);
                 
                 //Assert
                 Assert.That(result.Records.Count <= 10);
@@ -47,7 +47,7 @@ namespace turboSMTP.Test.EmailValidator.EmailValidatorFiles
                 .Build();
 
             //Act
-            var result = await TS.EmailValidatorFiles.Query(emailValidatorFilesQueryOptions);
+            var result = await TS.EmailValidatorFiles.QueryAsync(emailValidatorFilesQueryOptions);
             
             //Assert
             Assert.That(result.Records.Count <= emailValidatorFilesQueryOptions.Limit, $"Limit = {emailValidatorFilesQueryOptions.Limit} - Returned results = {result.TotalRecords}");

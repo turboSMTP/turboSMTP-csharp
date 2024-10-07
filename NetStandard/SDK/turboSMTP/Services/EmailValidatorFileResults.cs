@@ -10,7 +10,7 @@ namespace TurboSMTP.Services
     {
         public EmailValidatorFileResults(Configuration configuration, string timeZone) : base(configuration, timeZone){}
 
-        public async Task<PagedListResults<EmailAddressValidationDetails>> Query(EmailValidatorFileResultsQueryOptions options)
+        public async Task<PagedListResults<EmailAddressValidationDetails>> QueryAsync(EmailValidatorFileResultsQueryOptions options)
         {
             var response = await API.GetValidatedEmailsByListAsync(options.FileId,options.Page, options.Limit);
             
@@ -31,7 +31,7 @@ namespace TurboSMTP.Services
             };
         }
 
-        public async Task<string> Export(int id)
+        public async Task<string> ExportAsync(int id)
         {
             var response = await API.ExportCSVValidatedEmailsByListAsync(id);
             return response;

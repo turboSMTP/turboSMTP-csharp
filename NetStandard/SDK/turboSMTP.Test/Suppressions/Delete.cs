@@ -19,7 +19,7 @@ namespace TurboSMTP.Test.Suppressions
             //Act
             try
             {
-                var result = await TS.Suppressions.DeleteRange(new List<string>());
+                var result = await TS.Suppressions.DeleteRangeAsync(new List<string>());
                 //Assert
                 
                 Assert.That(!result);
@@ -42,7 +42,7 @@ namespace TurboSMTP.Test.Suppressions
             //Act
             try
             {
-                var result = await TS.Suppressions.Delete(emailAddressToDelete);
+                var result = await TS.Suppressions.DeleteAsync(emailAddressToDelete);
                 //Assert
                 Assert.That(result);
             }
@@ -64,9 +64,9 @@ namespace TurboSMTP.Test.Suppressions
             //Act
             try
             {
-                await TS.Suppressions.Add($"Adding One to Delete - {GetFormatedDateTime()}", emailAddressToDelete);
+                await TS.Suppressions.AddAsync($"Adding One to Delete - {GetFormatedDateTime()}", emailAddressToDelete);
                 
-                var result = await TS.Suppressions.Delete(emailAddressToDelete);
+                var result = await TS.Suppressions.DeleteAsync(emailAddressToDelete);
                 
                 //Assert
                 Assert.That(result);
@@ -89,9 +89,9 @@ namespace TurboSMTP.Test.Suppressions
             //Act
             try
             {
-                await TS.Suppressions.AddRange($"Adding Multiple to Delete - {GetFormatedDateTime()}", emailAddressesToDelete);
+                await TS.Suppressions.AddRangeAsync($"Adding Multiple to Delete - {GetFormatedDateTime()}", emailAddressesToDelete);
                 
-                var result = await TS.Suppressions.DeleteRange(emailAddressesToDelete);
+                var result = await TS.Suppressions.DeleteRangeAsync(emailAddressesToDelete);
                 
                 //Assert
                 Assert.That(result);
@@ -117,11 +117,11 @@ namespace TurboSMTP.Test.Suppressions
             //Act
             try
             {
-                await TS.Suppressions.Add($"Adding To Delete Today Test - {GetFormatedDateTime()}",
+                await TS.Suppressions.AddAsync($"Adding To Delete Today Test - {GetFormatedDateTime()}",
                     $"{GetFormatedDateTimeCompressed()}random@gmail.com"
                     );
                 
-                var result = await TS.Suppressions.Delete(deleteOptions);
+                var result = await TS.Suppressions.DeleteAsync(deleteOptions);
                 Assert.That(result);
             }
             catch (Exception ex)
@@ -145,12 +145,12 @@ namespace TurboSMTP.Test.Suppressions
                 .Build();
                 
 
-            await TS.Suppressions.Add($"Adding To Delete Manual Test - {GetFormatedDateTime()}",
+            await TS.Suppressions.AddAsync($"Adding To Delete Manual Test - {GetFormatedDateTime()}",
                 $"{GetFormatedDateTimeCompressed()}random@gmail.com"
                 );
             
             //Act
-            var result = await TS.Suppressions.Delete(deleteOptions);
+            var result = await TS.Suppressions.DeleteAsync(deleteOptions);
             
             //Assert
             Assert.That(result);
@@ -170,12 +170,12 @@ namespace TurboSMTP.Test.Suppressions
                 .SetSmartSearch(true)
                 .Build();
 
-            var addResult = await TS.Suppressions.Add($"Adding To Delete Manual Test - {GetFormatedDateTime()}",
+            var addResult = await TS.Suppressions.AddAsync($"Adding To Delete Manual Test - {GetFormatedDateTime()}",
                 $"{GetFormatedDateTimeCompressed()}random@gmail.com"
                 );
             //Act
             
-            var result = await TS.Suppressions.Delete(deleteOptions);
+            var result = await TS.Suppressions.DeleteAsync(deleteOptions);
             //Assert
             Assert.That(result);
             Assert.Pass();
@@ -204,12 +204,12 @@ namespace TurboSMTP.Test.Suppressions
                 .SetRestrictions(restriction)
                 .Build();
             
-            var addResult = await TS.Suppressions.Add($"Adding To Delete By Subject Contains - {GetFormatedDateTime()}",
+            var addResult = await TS.Suppressions.AddAsync($"Adding To Delete By Subject Contains - {GetFormatedDateTime()}",
                 $"{GetFormatedDateTimeCompressed()}random@gmail.com"
                 );
             
             //Act
-            var result = await TS.Suppressions.Delete(deleteOptions);
+            var result = await TS.Suppressions.DeleteAsync(deleteOptions);
             //Assert
             Assert.That(result);
             Assert.Pass();

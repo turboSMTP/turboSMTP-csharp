@@ -17,7 +17,7 @@ namespace TurboSMTP.Services
     {
         public EmailValidatorFiles(Configuration configuration, string timeZone) : base(configuration,timeZone) {}
 
-        public async Task<int> Add(string filename, List<string> emailAddresses)
+        public async Task<int> AddAsync(string filename, List<string> emailAddresses)
         {
             if (emailAddresses == null || emailAddresses.Count==0) { throw new ArgumentException("emailAddress"); }
             
@@ -45,7 +45,7 @@ namespace TurboSMTP.Services
             return res.ListId;
         }
 
-        public async Task<PagedListResults<EmailValidatorFile>> Query(EmailValidatorFilesQueryOptions options)
+        public async Task<PagedListResults<EmailValidatorFile>> QueryAsync(EmailValidatorFilesQueryOptions options)
         {
 
             var response = await API.GetEmailValidationListsAsync(
@@ -69,7 +69,7 @@ namespace TurboSMTP.Services
             };
         }
 
-        public async Task<EmailValidatorFile> Get(int id)
+        public async Task<EmailValidatorFile> GetAsync(int id)
         {
             try
             {
@@ -90,7 +90,7 @@ namespace TurboSMTP.Services
 
         }
 
-        public async Task<Boolean> Delete(int id)
+        public async Task<Boolean> DeleteAsync(int id)
         {
             try
             {
@@ -104,7 +104,7 @@ namespace TurboSMTP.Services
 
         }
 
-        public async Task<Boolean> Validate(int id)
+        public async Task<Boolean> ValidateAsync(int id)
         {
             try
             {

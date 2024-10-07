@@ -19,7 +19,7 @@ namespace turboSMTP.Test.EmailValidator.EmailValidatorFiles
             //Act
             try
             {
-                fileId = await TS.EmailValidatorFiles.Add(
+                fileId = await TS.EmailValidatorFiles.AddAsync(
                     $"{GetFormatedDateTimeCompressed()}-EmailvalidatorFile.txt",
                     AppConstants.InvalidEmailAddresses.GetRange(0,2));
                 
@@ -40,7 +40,7 @@ namespace turboSMTP.Test.EmailValidator.EmailValidatorFiles
             //Act
             try
             {
-                await TS.EmailValidatorFiles.Add($"{GetFormatedDateTimeCompressed()}-EmailvalidatorFile.txt",
+                await TS.EmailValidatorFiles.AddAsync($"{GetFormatedDateTimeCompressed()}-EmailvalidatorFile.txt",
                     new List<string>());
             }
             catch (ArgumentException ex)

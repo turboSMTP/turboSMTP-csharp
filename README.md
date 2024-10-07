@@ -150,13 +150,13 @@ namespace ConsoleApp
             var TSClient = new TurboSMTPClient(TurboSMTPClientConfiguration.Instance);
 
             //Send your Email Message
-            var result = await TSClient.Emails.Send(emailMessage);
+            var result = await TSClient.Emails.SendAsync(emailMessage);
         }
     }
 }
 ```
 
-*After executing the above code, `result.Message` should be `OK` and `MessageID` should contain a reference number to your sending operation, and you should have an email in the inbox of the `to` recipient. You can check the status of your email [in the UI][turboSMTP_analytics_dashboard], or using **TurboSMTPClient.Relays.Query()** method. Alternatively, we can post events to a URL of your choice using our [Event Webhooks][turboSMTP_webhooks_reference]. This gives you information about the events that occur as turboSMTP processes your email.* 
+*After executing the above code, `result.Message` should be `OK` and `MessageID` should contain a reference number to your sending operation, and you should have an email in the inbox of the `to` recipient. You can check the status of your email [in the UI][turboSMTP_analytics_dashboard], or using **TurboSMTPClient.Relays.QueryAsync()** method. Alternatively, we can post events to a URL of your choice using our [Event Webhooks][turboSMTP_webhooks_reference]. This gives you information about the events that occur as turboSMTP processes your email.* 
 
 # Usage
 

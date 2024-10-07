@@ -26,7 +26,7 @@ namespace TurboSMTP.Services
             TimeZone = timeZone;
         }
 
-        public async Task<PagedListResults<Relay>> Query(RelaysQueryOptions queryOptions)
+        public async Task<PagedListResults<Relay>> QueryAsync(RelaysQueryOptions queryOptions)
         {
 
             var response = await API.GetAnalyticsDataAsync(
@@ -62,7 +62,7 @@ namespace TurboSMTP.Services
             };
         }
 
-        public async Task<string> Export(RelaysExportOptions options)
+        public async Task<string> ExportAsync(RelaysExportOptions options)
         {
             var response = await API.ExportAnalyticsDataCSVAsync(
                 options.From,
