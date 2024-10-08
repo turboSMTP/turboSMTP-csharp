@@ -16,6 +16,7 @@ namespace turboSMTP.Test
             "live@service.alibaba.com",
             "live@service.alibaba.com"
         };
+      
         public static readonly List<string> InvalidEmailAddresses = new List<string>()
         {
             "random-guid-9981D02A-AE85-448C-B4FB-A4F70339FD18@gmail.com",
