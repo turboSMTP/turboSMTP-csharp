@@ -1,0 +1,11 @@
+# API.TurboSMTP.Model.SubAccountListSucessResponsetBody
+
+## Properties
+
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**Count** | **int** |  | [optional] 
+**Results** | [**List&lt;SubaccountListItem&gt;**](SubaccountListItem.md) |  | [optional] 
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
